@@ -1,0 +1,312 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  Admin
+  HOD
+  Employee
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum EmployeeStatus {
+  Contract
+  Permanent
+}
+
+enum AnnouncementTypes {
+  General
+  Department
+}
+
+enum TypeOfLeave {
+  Paid
+  Unpaid
+}
+
+enum LeaveStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum AttendanceStatus {
+  Present
+  Absent
+}
+
+enum TaskStatus {
+  Not_Started
+  Paused
+  In_Progress
+  Done 
+  Canceled
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String @unique
+  password String
+  role UserRole
+
+  admins Admin[]
+  employees Employee[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+  name String
+  phone String @unique
+
+  user_id Int
+  user User @relation(fields: [user_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Employee {
+  id Int @id @default(autoincrement())
+  full_name String
+  phone String @unique
+  address String
+  date_of_birth String
+  gender Gender
+  work_entry_date String
+  employee_status EmployeeStatus
+
+  user_id Int
+  user User @relation(fields: [user_id], references: [id])
+
+  department_id Int
+  department Department @relation(fields: [department_id], references: [id])
+
+  position_id Int
+  position JobPosition @relation(fields: [position_id], references: [id])
+
+  leave_requests LeaveRequest[]
+  leave_allowances LeaveAllowance[]
+  attendances Attendance[]
+  employee_work_shifts EmployeeWorkShift[]
+  employee_tasks EmployeeTask[]
+  salary_slips SalarySlip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("employees")
+}
+
+model Department {
+  id Int @id @default(autoincrement())
+  department_name String
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+  department_documents DepartmentDocument[]
+  announcements Announcement[]
+  employee_tasks EmployeeTask[]
+
+  @@map("departments")
+}
+
+model JobPosition {
+  id Int @id @default(autoincrement())
+  position_name String
+  description String
+  basic_salary Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+
+  @@map("job_positions")
+}
+
+model DepartmentDocument {
+  id Int @id @default(autoincrement())
+  document_name String
+  document_file String
+  description String
+  
+  department_id Int
+  department Department @relation(fields: [department_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("department_documents")
+}
+
+model Announcement {
+  id Int @id @default(autoincrement())
+  title String
+  content String 
+  date String
+  announcement_types AnnouncementTypes
+  
+  department_id Int
+  department Department @relation(fields: [department_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+model Leave {
+  id Int @id @default(autoincrement())
+  leave_name String
+  type_of_leave TypeOfLeave 
+  value Int
+
+  leave_request LeaveRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leaves")
+}
+
+model LeaveRequest {
+  id Int @id @default(autoincrement())
+  start_date DateTime
+  end_date DateTime 
+  long_leave Int
+  message String
+  status LeaveStatus
+
+  leave_id Int
+  leave Leave @relation(fields: [leave_id], references: [id])
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leave_requests")
+}
+
+model LeaveAllowance {
+  id Int @id @default(autoincrement())
+  leave_allowances Int @default(12)
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leave_allowances")
+}
+
+model Attendance {
+  id Int @id @default(autoincrement())
+  date String
+  time_in String
+  time_out String
+  status AttendanceStatus
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("attendances")
+}
+
+model WorkShift {
+  id Int @id @default(autoincrement())
+  shift_name String
+  start_time DateTime
+  end_time DateTime
+
+  employee_work_shifts EmployeeWorkShift[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("work_shifts")
+}
+
+model EmployeeWorkShift {
+  id Int @id @default(autoincrement())
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  shift_id Int
+  shift WorkShift @relation(fields: [shift_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("employee_work_shifts")
+}
+
+model EmployeeTask {
+  id Int @id @default(autoincrement())
+  task_title String
+  task_description String
+  deadline DateTime
+  status TaskStatus
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  department_id Int
+  department Department @relation(fields: [department_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("employee_tasks")
+}
+
+model SalarySlip {
+  id Int @id @default(autoincrement())
+  month String
+  year String
+  bonus Int
+  allowance Int
+  overtime Int
+  total_cuts Int
+  net_salary Int
+
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("salary_slips")
+}
