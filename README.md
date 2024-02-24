@@ -1,4 +1,4 @@
-## Backend Watch E-commerce System
+## Backend HR System
 
 HR Web System is a comprehensive and user-friendly web-based application designed to streamline and enhance various Human Resources (HR) functions within an organization. This system serves as a centralized platform for managing and automating HR processes, promoting efficiency, accuracy, and transparency across the workforce.
 
