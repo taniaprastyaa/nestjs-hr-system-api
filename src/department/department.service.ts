@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DepartmentDto } from './dto';
 
@@ -8,25 +9,31 @@ export class DepartmentService {
     constructor(private prisma: PrismaService) {}
 
     // Get all departments
-    async getAllDepartment() {
+    async getAllDepartment() : Promise<ResponseFormatter> {
         const departments = await this.prisma.department.findMany();
 
-        return departments;
+        return ResponseFormatter.success(
+            "Department fetched successfully",
+            departments
+        );
     }
 
     // Get department by id
     async getDepartmentById(
         departmentWhereUniqueInput: Prisma.DepartmentWhereUniqueInput,
-    ) {
+    ) : Promise<ResponseFormatter> {
         const department = await this.prisma.department.findUnique({
             where: departmentWhereUniqueInput,
         });
 
-        return department;
+        return ResponseFormatter.success(
+            "Department fetched successfully",
+            department
+        );
     }
 
     // Store department to database
-    async createDepartment(dto: DepartmentDto) {
+    async createDepartment(dto: DepartmentDto) : Promise<ResponseFormatter> {
         try {
             const department = await this.prisma.department.create({
                 data: {
@@ -34,7 +41,11 @@ export class DepartmentService {
                 }
             });
 
-            return department;
+            return ResponseFormatter.success(
+                "Department created successfully",
+                department,
+                201
+            );
         } catch (err) {
             if(err.code === 'P2002') {
                 throw new BadRequestException('Department already exist');
@@ -48,7 +59,7 @@ export class DepartmentService {
     async updateDepartment(params: {
         where: Prisma.DepartmentWhereUniqueInput;
         dto: DepartmentDto;
-    }) {
+    }) : Promise<ResponseFormatter> {
         try {
             const {where, dto} = params;
             const department = await this.prisma.department.update({
@@ -56,7 +67,10 @@ export class DepartmentService {
                 data: {...dto,}
             });
 
-            return department;
+            return ResponseFormatter.success(
+                "Department updated successfully",
+                department
+            );
         } catch (err) {
             if(err.code === 'P2002') {
                 throw new BadRequestException('Department already exist');
@@ -67,13 +81,16 @@ export class DepartmentService {
     }
 
     // Delete department in database
-    async deleteDepartment(where: Prisma.DepartmentWhereUniqueInput) {
+    async deleteDepartment(where: Prisma.DepartmentWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
             const department = await this.prisma.department.delete({
                 where,
             });
 
-            return department;
+            return ResponseFormatter.success(
+                "Department deleted successfully",
+                department
+            );
         } catch (err) {
             throw new InternalServerErrorException('Department failed to delete');
         }

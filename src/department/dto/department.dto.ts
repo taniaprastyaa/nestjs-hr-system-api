@@ -12,7 +12,7 @@ export class DepartmentDto {
 
     @ApiProperty({
         description: "The description of the department",
-        example: "Marketing",
+        example: "This is department description",
     })
     @IsString()
     @IsNotEmpty()
