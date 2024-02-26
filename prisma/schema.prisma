@@ -122,7 +122,7 @@ model Employee {
 
 model Department {
   id Int @id @default(autoincrement())
-  department_name String
+  department_name String @unique
   description String
 
   createdAt DateTime @default(now())
@@ -138,7 +138,7 @@ model Department {
 
 model JobPosition {
   id Int @id @default(autoincrement())
-  position_name String
+  position_name String @unique
   description String
   basic_salary Int
 
@@ -183,9 +183,9 @@ model Announcement {
 
 model Leave {
   id Int @id @default(autoincrement())
-  leave_name String
+  leave_name String @unique
   type_of_leave TypeOfLeave 
-  value Int
+  value Float
 
   leave_request LeaveRequest[]
 

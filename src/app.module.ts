@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { JobPositionModule } from './job_position/job_position.module';
+import { LeaveModule } from './leave/leave.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -13,7 +14,8 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule, 
     PrismaModule,
     DepartmentModule,
-    JobPositionModule
+    JobPositionModule,
+    LeaveModule
   ],
 })
 export class AppModule {}
