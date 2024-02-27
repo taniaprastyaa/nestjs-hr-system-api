@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { JobPositionModule } from './job_position/job_position.module';
@@ -17,7 +18,8 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
     DepartmentModule,
     JobPositionModule,
     LeaveModule,
-    WorkShiftModule
+    WorkShiftModule,
+    AdminModule
   ],
 })
 export class AppModule {}
