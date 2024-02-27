@@ -5,6 +5,7 @@ import { DepartmentModule } from './department/department.module';
 import { JobPositionModule } from './job_position/job_position.module';
 import { LeaveModule } from './leave/leave.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { WorkShiftModule } from './work_shift/work_shift.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     DepartmentModule,
     JobPositionModule,
-    LeaveModule
+    LeaveModule,
+    WorkShiftModule
   ],
 })
 export class AppModule {}
