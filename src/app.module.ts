@@ -4,6 +4,7 @@ import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { EmployeeModule } from './employee/employee.module';
+import { EmployeeWorkShiftModule } from './employee_work_shift/employee_work_shift.module';
 import { JobPositionModule } from './job_position/job_position.module';
 import { LeaveModule } from './leave/leave.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -21,7 +22,8 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
     LeaveModule,
     WorkShiftModule,
     AdminModule,
-    EmployeeModule
+    EmployeeModule,
+    EmployeeWorkShiftModule
   ],
 })
 export class AppModule {}
