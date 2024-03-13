@@ -10,11 +10,24 @@ export class AnnouncementService {
 
     // Get all announcements
     async getAllAnnouncement() : Promise<ResponseFormatter> {
-        const announcements = await this.prisma.announcement.findMany({
+        const generalAnnouncements = await this.prisma.announcement.findMany({
+            where: {
+                department_id: null
+            }
+        });
+
+        const departmentAnnouncements = await this.prisma.announcement.findMany({
+            where: {
+                department_id: {
+                    not: null
+                }
+            },
             include: {
                 department: true,
             },
         });
+
+        const announcements = [generalAnnouncements, departmentAnnouncements]
 
         return ResponseFormatter.success(
             "Announcement fetched successfully",
