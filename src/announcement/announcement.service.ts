@@ -10,7 +10,11 @@ export class AnnouncementService {
 
     // Get all announcements
     async getAllAnnouncement() : Promise<ResponseFormatter> {
-        const announcements = await this.prisma.announcement.findMany();
+        const announcements = await this.prisma.announcement.findMany({
+            include: {
+                department: true,
+            },
+        });
 
         return ResponseFormatter.success(
             "Announcement fetched successfully",
@@ -24,6 +28,9 @@ export class AnnouncementService {
     ) : Promise<ResponseFormatter> {
         const announcement = await this.prisma.announcement.findUnique({
             where: announcementWhereUniqueInput,
+            include: {
+                department: true,
+            },
         });
 
         return ResponseFormatter.success(
