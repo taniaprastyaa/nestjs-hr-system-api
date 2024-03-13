@@ -20,7 +20,7 @@ export class AnnouncementDto {
 
     @ApiProperty({
         description: "The date of the announcement",
-        example: "Announcement",
+        example: "2024-03-04",
     })
     @IsString()
     @IsNotEmpty()
