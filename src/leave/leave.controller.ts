@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { LeaveService } from "./leave.service";
 import { LeaveDto } from "./dto";
@@ -10,18 +10,21 @@ export class LeaveController{
     constructor(private leaveService: LeaveService) {}
 
     // Get all deparments
+    @ApiBearerAuth()
     @Get()
-    getAllDeparments() : Promise<ResponseFormatter> {
+    getAllLeaves() : Promise<ResponseFormatter> {
         return this.leaveService.getAllLeave();
     }
 
     // Get leave by id
+    @ApiBearerAuth()
     @Get(':id')
     getLeave(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.leaveService.getLeaveById({id: Number(id)});
     }
 
     // Store leave to database
+    @ApiBearerAuth()
     @Post()
     async createLeave(
         @Body() dto: LeaveDto
@@ -30,6 +33,7 @@ export class LeaveController{
     }
 
     // Update leave in database
+    @ApiBearerAuth()
     @Put(':id')
     async updateLeave(
         @Param('id') id: string,
@@ -42,6 +46,7 @@ export class LeaveController{
     }
 
     // Delete leave in database
+    @ApiBearerAuth()
     @Delete(':id')
     async deleteLeave(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.leaveService.deleteLeave({id: Number(id)});

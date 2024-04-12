@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { AnnouncementService } from "./announcement.service";
 import { AnnouncementDto } from "./dto";
@@ -10,18 +10,21 @@ export class AnnouncementController{
     constructor(private announcementService: AnnouncementService) {}
 
     // Get all announcement
+    @ApiBearerAuth()
     @Get()
-    getAllDeparments() : Promise<ResponseFormatter> {
+    getAllAnnouncements() : Promise<ResponseFormatter> {
         return this.announcementService.getAllAnnouncement();
     }
 
     // Get announcement by id
+    @ApiBearerAuth()
     @Get(':id')
     getAnnouncement(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.announcementService.getAnnouncementById({id: Number(id)});
     }
 
     // Store announcement to database
+    @ApiBearerAuth()
     @Post()
     async createAnnouncement(
         @Body() dto: AnnouncementDto
@@ -30,6 +33,7 @@ export class AnnouncementController{
     }
 
     // Update announcement in database
+    @ApiBearerAuth()
     @Put(':id')
     async updateAnnouncement(
         @Param('id') id: string,
@@ -42,6 +46,7 @@ export class AnnouncementController{
     }
 
     // Delete announcement in database
+    @ApiBearerAuth()
     @Delete(':id')
     async deleteAnnouncement(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.announcementService.deleteAnnouncement({id: Number(id)});

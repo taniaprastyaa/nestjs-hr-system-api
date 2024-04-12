@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { JobPositionService } from "./job_position.service";
 import { JobPositionDto } from "./dto";
@@ -11,17 +11,20 @@ export class JobPositionController{
 
     // Get all job position
     @Get()
+    @ApiBearerAuth()
     getAllJobPosition() : Promise<ResponseFormatter> {
         return this.jobPositionService.getAllJobPosition();
     }
 
     // Get job position by id
+    @ApiBearerAuth()
     @Get(':id')
     getJobPosition(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.jobPositionService.getJobPositionById({id: Number(id)});
     }
 
     // Store job position to database
+    @ApiBearerAuth()
     @Post()
     async createJobPosition(
         @Body() dto: JobPositionDto
@@ -30,6 +33,7 @@ export class JobPositionController{
     }
 
     // Update job position in database
+    @ApiBearerAuth()
     @Put(':id')
     async updateJobPosition(
         @Param('id') id: string,
@@ -42,6 +46,7 @@ export class JobPositionController{
     }
 
     // Delete job position in database
+    @ApiBearerAuth()
     @Delete(':id')
     async deleteJobPosition(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.jobPositionService.deleteJobPosition({id: Number(id)});

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { WorkShiftService } from "./work_shift.service";
 import { WorkShiftDto } from "./dto";
@@ -10,18 +10,21 @@ export class WorkShiftController{
     constructor(private workShiftService: WorkShiftService) {}
 
     // Get all work shifts
+    @ApiBearerAuth()
     @Get()
     getAllDeparments() : Promise<ResponseFormatter> {
         return this.workShiftService.getAllWorkShift();
     }
 
     // Get work shift by id
+    @ApiBearerAuth()
     @Get(':id')
     getWorkShift(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.workShiftService.getWorkShiftById({id: Number(id)});
     }
 
     // Store work shift to database
+    @ApiBearerAuth()
     @Post()
     async createWorkShift(
         @Body() dto: WorkShiftDto
@@ -30,6 +33,7 @@ export class WorkShiftController{
     }
 
     // Update work shift in database
+    @ApiBearerAuth()
     @Put(':id')
     async updateWorkShift(
         @Param('id') id: string,
@@ -42,6 +46,7 @@ export class WorkShiftController{
     }
 
     // Delete work shift in database
+    @ApiBearerAuth()
     @Delete(':id')
     async deleteWorkShift(@Param('id') id: string) : Promise<ResponseFormatter> {
         return this.workShiftService.deleteWorkShift({id: Number(id)});
