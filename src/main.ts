@@ -17,6 +17,7 @@ async function bootstrap() {
   .setTitle('HR System API Documentation')
   .setDescription('This is the API documentation for HR System')
   .setVersion('1.0')
+  .addBearerAuth()
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);
