@@ -120,7 +120,7 @@ export class AuthService {
             this.jwtService.signAsync(
                 jwtPayload, {
                     secret: this.config.get<string>('AT_SECRET'),
-                    expiresIn: '1d'
+                    expiresIn: '1m'
                 }
             ),
             this.jwtService.signAsync(
