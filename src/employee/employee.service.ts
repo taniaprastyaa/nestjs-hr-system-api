@@ -46,6 +46,17 @@ export class EmployeeService {
 
     // Store employee to database
     async createEmployee(dto: CreateEmployeeDto): Promise<ResponseFormatter>{
+        // Check if the provided phone number already exists for any employee
+        const existingEmployee = await this.prisma.employee.findFirst({
+            where: {
+                phone: dto.phone
+            }
+        });
+
+        if (existingEmployee) {
+            throw new BadRequestException('Employee with the same phone number already exists');
+        }
+
         const hash = await argon.hash(dto.password);
         try {
             const user = await this.prisma.user.create({
