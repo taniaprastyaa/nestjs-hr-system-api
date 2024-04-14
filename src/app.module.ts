@@ -10,6 +10,7 @@ import { EmployeeModule } from './employee/employee.module';
 import { EmployeeWorkShiftModule } from './employee_work_shift/employee_work_shift.module';
 import { JobPositionModule } from './job_position/job_position.module';
 import { LeaveModule } from './leave/leave.module';
+import { LeaveAllowanceModule } from './leave_allowance/leave_allowance.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkShiftModule } from './work_shift/work_shift.module';
 
@@ -27,7 +28,8 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
     AdminModule,
     EmployeeModule,
     EmployeeWorkShiftModule,
-    AnnouncementModule
+    AnnouncementModule,
+    LeaveAllowanceModule
   ],
   providers: [
     {

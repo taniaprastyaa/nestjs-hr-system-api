@@ -215,7 +215,7 @@ model LeaveAllowance {
   leave_allowances Int @default(12)
   year String
 
-  employee_id Int
+  employee_id Int @unique
   employee Employee @relation(fields: [employee_id], references: [id])
 
   createdAt DateTime @default(now())
