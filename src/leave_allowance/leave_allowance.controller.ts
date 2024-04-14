@@ -5,7 +5,7 @@ import { LeaveAllowanceService } from "./leave_allowance.service";
 import { CreateLeaveAllowanceDto, UpdateLeaveAllowanceDto } from "./dto";
 
 @ApiTags("Leave Allowance")
-@Controller('leaveAllowances')
+@Controller('leave_allowance')
 export class LeaveAllowanceController{
     constructor(private leaveAllowanceService: LeaveAllowanceService) {}
 
