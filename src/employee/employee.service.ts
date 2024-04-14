@@ -85,6 +85,15 @@ export class EmployeeService {
                 },
             });
 
+            // Create employee leave allowance
+            const currentYear = new Date().getFullYear().toString();
+            const employeeLeaveAllowance = await this.prisma.leaveAllowance.create({
+                data: {
+                    employee_id : employee.id,
+                    year : currentYear,
+                },
+            });
+
             const userEmployee = {user, employee};
             
             return ResponseFormatter.success(
