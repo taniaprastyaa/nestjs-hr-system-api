@@ -53,6 +53,12 @@ enum TaskStatus {
   Canceled
 }
 
+enum TaskPriority {
+  High
+  Medium
+  Low
+}
+
 model User {
   id Int @id @default(autoincrement())
   username String @unique
@@ -63,6 +69,7 @@ model User {
 
   admins Admin[]
   employees Employee[]
+  assignedEmployeesTemp EmployeesOnAssignmentTemp[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,8 +114,10 @@ model Employee {
   leave_allowances LeaveAllowance[]
   attendances Attendance[]
   employee_work_shifts EmployeeWorkShift[]
-  employee_tasks EmployeeTask[]
   salary_slips SalarySlip[]
+  employee_tasks EmployeeTask[]
+  assignedEmployees EmployeesOnAssignment[]
+    assignedEmployeesTemp EmployeesOnAssignmentTemp[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,8 +157,8 @@ model JobPosition {
 
 model DepartmentDocument {
   id Int @id @default(autoincrement())
-  document_name String
-  document_file String
+  document_name String @unique
+  document_file String @unique
   description String
   
   department_id Int
@@ -275,17 +284,44 @@ model EmployeeTask {
   task_description String
   deadline DateTime
   status TaskStatus
-
-  employee_id Int
-  employee Employee @relation(fields: [employee_id], references: [id])
-
+  
   department_id Int
   department Department @relation(fields: [department_id], references: [id])
+
+  priority   TaskPriority
+  assigned_by Int?
+  employee Employee? @relation(fields: [assigned_by], references: [id])
+  completedAt DateTime?
+  notes      String?
+  attachment String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  assignedEmployees EmployeesOnAssignment[]
+
   @@map("employee_tasks")
+}
+
+model EmployeesOnAssignment {
+  id Int @id @default(autoincrement())
+  employee Employee @relation(fields: [employee_id], references: [id])
+  employee_id Int
+  task EmployeeTask @relation(fields: [employee_task_id], references: [id])
+  employee_task_id Int
+
+  @@map("employees_on_assignment")
+}
+
+model EmployeesOnAssignmentTemp {
+  id Int @id @default(autoincrement())
+  employee_id Int
+  user_id Int
+
+  employee Employee @relation(fields: [employee_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("employees_on_assignment_temp")
 }
 
 model SalarySlip {
