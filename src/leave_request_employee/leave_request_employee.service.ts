@@ -2,15 +2,15 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LeaveRequestDto } from './dto';
+import { LeaveRequestEmployeeDto } from './dto';
 
 @Injectable()
-export class LeaveRequestService {
+export class LeaveRequestEmployeeService {
     constructor(private prisma: PrismaService) {}
 
-    // Get all leaveRequests
-    async getAllLeaveRequest(employee_id: number) : Promise<ResponseFormatter> {
-        const leaveRequests = await this.prisma.leaveRequest.findMany({
+    // Get all leaveRequestEmployees
+    async getAllLeaveRequestEmployee(employee_id: number) : Promise<ResponseFormatter> {
+        const leaveRequestEmployees = await this.prisma.leaveRequest.findMany({
             where:{
                 employee_id
             }
@@ -18,7 +18,7 @@ export class LeaveRequestService {
 
         return ResponseFormatter.success(
             "Leave request fetched successfully",
-            leaveRequests
+            leaveRequestEmployees
         );
     }
 
@@ -35,27 +35,27 @@ export class LeaveRequestService {
         return employee;
     }
 
-    // Get leaveRequest by id
-    async getLeaveRequestById(
+    // Get leaveRequestEmployee by id
+    async getLeaveRequestEmployeeById(
         leaveRequestWhereUniqueInput: Prisma.LeaveRequestWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const leaveRequest = await this.prisma.leaveRequest.findUnique({
+        const leaveRequestEmployee = await this.prisma.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
         });
 
         return ResponseFormatter.success(
             "Leave request fetched successfully",
-            leaveRequest
+            leaveRequestEmployee
         );
     }
 
-    // Store leaveRequest to database
-    async createLeaveRequest(dto: LeaveRequestDto, employee_id: number) : Promise<ResponseFormatter> {
+    // Store leaveRequestEmployee to database
+    async createLeaveRequestEmployee(dto: LeaveRequestEmployeeDto, employee_id: number) : Promise<ResponseFormatter> {
         try {
             const start_date = new Date(dto.start_date);
             const end_date = new Date(dto.end_date);
             const longLeave = this.calculateLeaveDays(start_date, end_date)
-            const leaveRequest = await this.prisma.leaveRequest.create({
+            const leaveRequestEmployee = await this.prisma.leaveRequest.create({
                 data: {
                     ...dto,
                     long_leave: longLeave,
@@ -66,22 +66,22 @@ export class LeaveRequestService {
 
             return ResponseFormatter.success(
                 "Leave request created successfully",
-                leaveRequest,
+                leaveRequestEmployee,
                 201
             );
         } catch (err) {
             if(err.code === 'P2002') {
-                throw new BadRequestException('LeaveRequest already exist');
+                throw new BadRequestException('LeaveRequestEmployee already exist');
             }
     
             throw new InternalServerErrorException('Leave request failed to create');
         }
     } 
 
-    // Update leaveRequest in database
-    async updateLeaveRequest(
+    // Update leaveRequestEmployee in database
+    async updateLeaveRequestEmployee(
         where: Prisma.LeaveRequestWhereUniqueInput,
-        dto: LeaveRequestDto
+        dto: LeaveRequestEmployeeDto
     ) : Promise<ResponseFormatter> {
         try {
 
@@ -89,13 +89,13 @@ export class LeaveRequestService {
             const end_date = new Date(dto.end_date);
             const longLeave = this.calculateLeaveDays(start_date, end_date);
 
-            const leaveRequestById = await this.getLeaveRequestById(where);
+            const leaveRequestEmployeeById = await this.getLeaveRequestEmployeeById(where);
 
-            if(leaveRequestById["data"]["status"] !== "Pending"){
+            if(leaveRequestEmployeeById["data"]["status"] !== "Pending"){
                 throw new BadRequestException("Leave request has already been processed and cannot be edited.");
             }
 
-            const leaveRequest = await this.prisma.leaveRequest.update({
+            const leaveRequestEmployee = await this.prisma.leaveRequest.update({
                 where,
                 data: {
                         ...dto,
@@ -105,7 +105,7 @@ export class LeaveRequestService {
 
             return ResponseFormatter.success(
                 "Leave request updated successfully",
-                leaveRequest
+                leaveRequestEmployee
             );
         } catch (err) {
             if (err instanceof BadRequestException) {
@@ -116,22 +116,22 @@ export class LeaveRequestService {
         }
     }
 
-    // Delete leaveRequest in database
-    async deleteLeaveRequest(where: Prisma.LeaveRequestWhereUniqueInput) : Promise<ResponseFormatter> {
+    // Delete leaveRequestEmployee in database
+    async deleteLeaveRequestEmployee(where: Prisma.LeaveRequestWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const leaveRequestById = await this.getLeaveRequestById(where);
+            const leaveRequestEmployeeById = await this.getLeaveRequestEmployeeById(where);
 
-            if(leaveRequestById["data"]["status"] !== "Pending"){
+            if(leaveRequestEmployeeById["data"]["status"] !== "Pending"){
                 throw new BadRequestException("Leave request has already been processed and cannot be edited.");
             }
 
-            const leaveRequest = await this.prisma.leaveRequest.delete({
+            const leaveRequestEmployee = await this.prisma.leaveRequest.delete({
                 where,
             });
 
             return ResponseFormatter.success(
                 "Leave request deleted successfully",
-                leaveRequest
+                leaveRequestEmployee
             );
         } catch (err) {
             if (err instanceof BadRequestException) {

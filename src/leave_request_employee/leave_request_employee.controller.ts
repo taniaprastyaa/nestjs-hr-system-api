@@ -1,74 +1,73 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
-import { LeaveRequestService } from "./leave_request_employee.service";
-import { LeaveRequestDto } from "./dto";
+import { LeaveRequestEmployeeService } from "./leave_request_employee.service";
+import { LeaveRequestEmployeeDto } from "./dto";
 import { GetCurrentUserId } from "src/common/decorators";
 
-@ApiTags("Leave Request")
-@Controller('leave_requests')
-export class LeaveRequestController{
-    constructor(private leaveRequestService: LeaveRequestService) {}
+@ApiTags("Leave Request Employee")
+@Controller('leave_request_employee')
+export class LeaveRequestEmployeeController{
+    constructor(private leaveRequestEmployeeService: LeaveRequestEmployeeService) {}
 
     // Get all deparments
     @ApiBearerAuth()
     @Get()
-    async getAllLeaveRequest(
+    async getAllLeaveRequestEmployee(
         @GetCurrentUserId() user_id: number,
     ) : Promise<ResponseFormatter> {
-        const employee = await this.leaveRequestService.getEmployeeByUserId(user_id);
-        return this.leaveRequestService.getAllLeaveRequest(employee[0].id);
+        const employee = await this.leaveRequestEmployeeService.getEmployeeByUserId(user_id);
+        return this.leaveRequestEmployeeService.getAllLeaveRequestEmployee(employee[0].id);
     }
 
-    // Get leaveRequest by id
+    // Get leaveRequestEmployee by id
     @ApiBearerAuth()
     @Get(':id')
-    async getLeaveRequest
+    async getLeaveRequestEmployee
     (
         @Param('id') id: string,
         @GetCurrentUserId() user_id: number,
     ) : Promise<ResponseFormatter> {
-        const employee = await this.leaveRequestService.getEmployeeByUserId(user_id);
-        return this.leaveRequestService.getLeaveRequestById({id: Number(id)});
+        return this.leaveRequestEmployeeService.getLeaveRequestEmployeeById({id: Number(id)});
     }
 
-    // Store leaveRequest to database
+    // Store leaveRequestEmployee to database
     @ApiBearerAuth()
     @Post()
-    async createLeaveRequest(
+    async createLeaveRequestEmployee(
         @GetCurrentUserId() user_id: number,
-        @Body() dto: LeaveRequestDto
+        @Body() dto: LeaveRequestEmployeeDto
     ) : Promise<ResponseFormatter> {
-        const employee = await this.leaveRequestService.getEmployeeByUserId(user_id);
+        const employee = await this.leaveRequestEmployeeService.getEmployeeByUserId(user_id);
 
-        return this.leaveRequestService.createLeaveRequest(dto, employee[0].id);
+        return this.leaveRequestEmployeeService.createLeaveRequestEmployee(dto, employee[0].id);
     }
 
-    // Update leaveRequest in database
+    // Update leaveRequestEmployee in database
     @ApiBearerAuth()
     @Put(':id')
-    async updateLeaveRequest(
+    async updateLeaveRequestEmployee(
         @Param('id') id: string,
         @GetCurrentUserId() user_id: number,
-        @Body() dto: LeaveRequestDto
+        @Body() dto: LeaveRequestEmployeeDto
     ) : Promise<ResponseFormatter> {
-        const employee = await this.leaveRequestService.getEmployeeByUserId(user_id);
+        const employee = await this.leaveRequestEmployeeService.getEmployeeByUserId(user_id);
 
-        return this.leaveRequestService.updateLeaveRequest(
+        return this.leaveRequestEmployeeService.updateLeaveRequestEmployee(
             {id: Number(id)},
             dto
         );
     }
 
-    // Delete leaveRequest in database
+    // Delete leaveRequestEmployee in database
     @ApiBearerAuth()
     @Delete(':id')
-    async deleteLeaveRequest(
+    async deleteLeaveRequestEmployee(
         @Param('id') id: string,
         @GetCurrentUserId() user_id: number
     ) : Promise<ResponseFormatter> {
-                const employee = await this.leaveRequestService.getEmployeeByUserId(user_id);
+                const employee = await this.leaveRequestEmployeeService.getEmployeeByUserId(user_id);
 
-        return this.leaveRequestService.deleteLeaveRequest({id: Number(id)});
+        return this.leaveRequestEmployeeService.deleteLeaveRequestEmployee({id: Number(id)});
     }
 }

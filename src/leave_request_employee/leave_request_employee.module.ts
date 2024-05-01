@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { LeaveRequestController } from './leave_request_employee.controller';
-import { LeaveRequestService } from './leave_request_employee.service';
+import { LeaveRequestEmployeeController } from './leave_request_employee.controller';
+import { LeaveRequestEmployeeService } from './leave_request_employee.service';
 
 @Module({
-  controllers: [LeaveRequestController],
-  providers: [LeaveRequestService]
+  controllers: [LeaveRequestEmployeeController],
+  providers: [LeaveRequestEmployeeService]
 })
-export class LeaveRequestModule {}
+export class LeaveRequestEmployeeModule {}
