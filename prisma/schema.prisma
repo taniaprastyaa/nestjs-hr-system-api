@@ -201,8 +201,8 @@ model Leave {
 
 model LeaveRequest {
   id Int @id @default(autoincrement())
-  start_date DateTime
-  end_date DateTime 
+  start_date String
+  end_date String 
   long_leave Int
   message String
   status LeaveStatus

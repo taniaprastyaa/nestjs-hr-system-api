@@ -14,6 +14,7 @@ import { EmployeeWorkShiftModule } from './employee_work_shift/employee_work_shi
 import { JobPositionModule } from './job_position/job_position.module';
 import { LeaveModule } from './leave/leave.module';
 import { LeaveAllowanceModule } from './leave_allowance/leave_allowance.module';
+import { LeaveRequestModule } from './leave_request_employee/leave_request_employee.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkShiftModule } from './work_shift/work_shift.module';
 
@@ -35,7 +36,8 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
     LeaveAllowanceModule,
     EmployeeTaskModule,
     EmployeesOnAssignmentTempModule,
-    EmployeesOnAssignmentModule
+    EmployeesOnAssignmentModule,
+    LeaveRequestModule
   ],
   providers: [
     {
