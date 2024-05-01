@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class LeaveRequestDto {
+export class LeaveRequestEmployeeDto {
     @ApiProperty({
         description: "The start date of the leave request",
         example: "2024-04-12",
