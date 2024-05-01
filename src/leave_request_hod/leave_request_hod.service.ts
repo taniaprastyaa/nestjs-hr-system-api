@@ -69,6 +69,31 @@ export class LeaveRequestHodService {
                 }
             });
 
+            if(leaveRequest && (leaveRequest.status === "Approved")){
+                const leaveAllowance =  await this.prisma.leaveAllowance.findUnique({
+                    where: {
+                        employee_id: leaveRequest.employee_id
+                    }
+                });
+
+                const leave = await this.prisma.leave.findUnique({
+                    where: {
+                        id: leaveRequest.leave_id
+                    },
+                });
+
+                const leaveAllowanceTotal = leaveAllowance.leave_allowances - (leaveRequest.long_leave * leave.value);
+
+                await this.prisma.leaveAllowance.update({
+                    where: {
+                        employee_id: leaveRequest.employee_id
+                    },
+                    data: {
+                        leave_allowances: leaveAllowanceTotal
+                    }
+                });
+            }
+
             return ResponseFormatter.success(
                 "Leave request updated successfully",
                 leaveRequest
