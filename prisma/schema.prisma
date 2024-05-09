@@ -43,6 +43,7 @@ enum LeaveStatus {
 enum AttendanceStatus {
   Present
   Absent
+  Leave
 }
 
 enum TaskStatus {
@@ -236,8 +237,8 @@ model LeaveAllowance {
 model Attendance {
   id Int @id @default(autoincrement())
   date String
-  time_in String
-  time_out String
+  time_in String?
+  time_out String?
   status AttendanceStatus
 
   employee_id Int

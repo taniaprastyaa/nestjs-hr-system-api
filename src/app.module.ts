@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { AdminModule } from './admin/admin.module';
 import { AnnouncementModule } from './announcement/announcement.module';
+import { EmployeeAttendanceModule } from './employee_attendance/employee_attendance.module';
 import { AuthModule } from './auth/auth.module';
 import { AtGuard } from './common/guards';
 import { DepartmentModule } from './department/department.module';
@@ -18,6 +19,7 @@ import { LeaveRequestEmployeeModule } from './leave_request_employee/leave_reque
 import { LeaveRequestHodModule } from './leave_request_hod/leave_request_hod.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkShiftModule } from './work_shift/work_shift.module';
+import { HodAttendanceModule } from './hod_attendance/hod_attendance.module';
 
 @Module({
   imports: [
@@ -39,7 +41,9 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
     EmployeesOnAssignmentTempModule,
     EmployeesOnAssignmentModule,
     LeaveRequestEmployeeModule,
-    LeaveRequestHodModule
+    LeaveRequestHodModule,
+    EmployeeAttendanceModule,
+    HodAttendanceModule
   ],
   providers: [
     {
