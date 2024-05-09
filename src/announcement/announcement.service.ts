@@ -9,17 +9,31 @@ export class AnnouncementService {
     constructor(private prisma: PrismaService) {}
 
     // Get all announcements
-    async getAllAnnouncement() : Promise<ResponseFormatter> {
+    async getAllAnnouncement(user_id: number) : Promise<ResponseFormatter> {
         const generalAnnouncements = await this.prisma.announcement.findMany({
             where: {
                 department_id: null
             }
         });
 
+        const employee = await this.prisma.employee.findMany({
+            where: {
+                user_id 
+            },
+            include: {
+                department: true
+            }
+        });
+
+        const department = employee[0]["department"]["department_name"];
+
         const departmentAnnouncements = await this.prisma.announcement.findMany({
             where: {
                 department_id: {
-                    not: null
+                    not: null,
+                },
+                department: {
+                    department_name: department
                 }
             },
             include: {

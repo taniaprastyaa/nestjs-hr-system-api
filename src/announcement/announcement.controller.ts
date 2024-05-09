@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { GetCurrentUserId } from "src/common/decorators";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { AnnouncementService } from "./announcement.service";
 import { AnnouncementDto } from "./dto";
@@ -12,8 +13,10 @@ export class AnnouncementController{
     // Get all announcement
     @ApiBearerAuth()
     @Get()
-    getAllAnnouncements() : Promise<ResponseFormatter> {
-        return this.announcementService.getAllAnnouncement();
+    getAllAnnouncements(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.announcementService.getAllAnnouncement(user_id);
     }
 
     // Get announcement by id
