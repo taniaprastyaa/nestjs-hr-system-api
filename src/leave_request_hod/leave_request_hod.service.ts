@@ -92,6 +92,42 @@ export class LeaveRequestHodService {
                         leave_allowances: leaveAllowanceTotal
                     }
                 });
+
+                // Hitung jumlah hari dalam rentang tanggal (start_date - end_date)
+                const startDate = new Date(leaveRequest.start_date);
+                const endDate = new Date(leaveRequest.end_date);
+                const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+
+                // Lakukan iterasi untuk setiap hari dalam rentang tanggal
+                for (let i = 0; i <= daysDifference; i++) {
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(currentDate.getDate() + i);
+
+                    // Periksa apakah karyawan sudah memiliki catatan kehadiran untuk tanggal tersebut
+                    const existingAttendance = await this.prisma.attendance.findFirst({
+                        where: {
+                        date: currentDate.toISOString().split('T')[0],
+                        employee_id: leaveRequest.employee_id,
+                        },
+                    });
+
+                    // Jika belum ada, buat catatan kehadiran baru dengan status 'Leave'
+                    if (!existingAttendance) {
+                        await this.prisma.attendance.create({
+                        data: {
+                            date: currentDate.toISOString().split('T')[0],
+                            status: 'Leave',
+                            employee: { connect: { id: leaveRequest.employee_id } },
+                        },
+                        });
+                    } else {
+                        // Jika sudah ada, update status ke 'Leave'
+                        await this.prisma.attendance.update({
+                        where: { id: existingAttendance.id },
+                        data: { status: 'Leave' },
+                        });
+                    }
+                }
             }
 
             return ResponseFormatter.success(
