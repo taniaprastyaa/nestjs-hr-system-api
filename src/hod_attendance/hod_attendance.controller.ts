@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { GetCurrentUserId } from "src/common/decorators";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { HodAttendanceService } from "./hod_attendance.service";
+import { UpdateAttendanceDto } from "./dto";
 
 @ApiTags("HOD Attendance")
 @Controller('hod_attendances')
@@ -32,5 +33,25 @@ export class HodAttendanceController{
         @GetCurrentUserId() user_id: number,
     ){
         return this.hodAttendanceService.checkMissingAttendance(user_id);
+    }
+
+    // Update attendance in database
+    @ApiBearerAuth()
+    @Put(':id')
+    async updateAttendance(
+        @Param('id') id: string,
+        @Body() dto: UpdateAttendanceDto
+    ) : Promise<ResponseFormatter> {
+        return this.hodAttendanceService.updateAttendance({
+            where: {id: Number(id)},
+            dto
+        })
+    }
+
+    // Delete attendance in database
+    @ApiBearerAuth()
+    @Delete(':id')
+    async deleteAttendance(@Param('id') id: string) : Promise<ResponseFormatter> {
+        return this.hodAttendanceService.deleteAttendance({id: Number(id)});
     }
 }

@@ -1,12 +1,13 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { AttendanceStatus, Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateAttendanceDto } from './dto';
 
 @Injectable()
 export class HodAttendanceService {
-    logger: any;
+    private readonly logger = new Logger(HodAttendanceService.name);
     constructor(private prisma: PrismaService) {}
 
     // Get all attendances
@@ -97,4 +98,72 @@ export class HodAttendanceService {
         }
       }
     }
+
+  // Update attendance in database
+  async updateAttendance(params: {
+      where: Prisma.AttendanceWhereUniqueInput;
+      dto: UpdateAttendanceDto;
+  }) : Promise<ResponseFormatter> {
+      try {
+          const {where, dto} = params;
+          const workShift = await this.prisma.employeeWorkShift.findFirst({
+            where: {
+                employee_id: dto.employee_id
+            },
+            include: {
+                shift: true
+            }
+        });
+        const startShiftTime = workShift["shift"]["start_time"];
+        const delayMinutes = this.calculateDelay(dto.time_in, startShiftTime);
+        const attendance = await this.prisma.attendance.update({
+              where,
+              data: {
+                ...dto,
+               delay_minutes: delayMinutes
+              }
+          });
+
+          return ResponseFormatter.success(
+              "Attendance updated successfully",
+              attendance
+          );
+      } catch (err) {
+        this.logger.error(`Error updating attendance: ${err.message}`, err.stack);
+          if(err.code === 'P2002') {
+              throw new BadRequestException('Attendance already exist');
+          }
+
+          throw new InternalServerErrorException('Attendance failed to update');
+      }
+  }
+
+  // Delete attendance in database
+  async deleteAttendance(where: Prisma.AttendanceWhereUniqueInput) : Promise<ResponseFormatter> {
+      try {
+          const attendance = await this.prisma.attendance.delete({
+              where,
+          });
+
+          return ResponseFormatter.success(
+              "Attendance deleted successfully",
+              attendance
+          );
+      } catch (err) {
+          throw new InternalServerErrorException('Attendance failed to delete');
+      }
+  }
+
+  calculateDelay(currentTime: string, startShiftTime: string): number {
+    // Assuming currentTime and startShiftTime are in format "HH:mm"
+    const currentTimeParts = currentTime.split(':').map(part => parseInt(part, 10));
+    const startShiftTimeParts = startShiftTime.split(':').map(part => parseInt(part, 10));
+
+    const currentTotalMinutes = currentTimeParts[0] * 60 + currentTimeParts[1];
+    const startShiftTotalMinutes = startShiftTimeParts[0] * 60 + startShiftTimeParts[1];
+
+    const delayMinutes = Math.max(currentTotalMinutes - startShiftTotalMinutes, 0);
+
+    return delayMinutes;
+  }
 }
