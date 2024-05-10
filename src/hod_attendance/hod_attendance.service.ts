@@ -91,6 +91,7 @@ export class HodAttendanceService {
               date: yesterdayISOString,
               status: AttendanceStatus.Absent,
               employee: { connect: { id: employee.id } },
+              delay_minutes: null
             },
           });
         }

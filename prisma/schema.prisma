@@ -225,7 +225,7 @@ model LeaveRequest {
 
 model LeaveAllowance {
   id Int @id @default(autoincrement())
-  leave_allowances Int @default(12)
+  leave_allowances Float @default(12)
   year String
 
   employee_id Int @unique
@@ -242,6 +242,7 @@ model Attendance {
   date String
   time_in String?
   time_out String?
+  delay_minutes Int?
   status AttendanceStatus
 
   employee_id Int
