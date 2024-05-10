@@ -54,8 +54,9 @@ export class HodAttendanceService {
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async checkMissingAttendance(user_id: number): Promise<void> {
-      // Mendapatkan tanggal hari ini
-      const todayDate = new Date().toISOString().split('T')[0];
+      const yesterdayDate = new Date();
+      yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+      const yesterdayISOString = yesterdayDate.toISOString().split('T')[0];
 
       const employee = await this.prisma.employee.findMany({
         where: {
@@ -68,29 +69,26 @@ export class HodAttendanceService {
 
     const department = employee[0]["department"]["department_name"];
   
-      // Mendapatkan semua employee
-      const employees = await this.prisma.employee.findMany({
-        where: {
-            department: {
-                department_name: department
-            }
+    const employees = await this.prisma.employee.findMany({
+      where: {
+        department: {
+          department_name: department
         }
-      });
+      }
+    });
   
-      // Loop melalui setiap employee dan cek apakah mereka sudah mengisi kehadiran hari ini
       for (const employee of employees) {
         const existingAttendance = await this.prisma.attendance.findFirst({
           where: {
-            date: todayDate,
+            date: yesterdayISOString,
             employee_id: employee.id,
           },
         });
   
-        // Jika karyawan belum mengisi kehadiran, tandai sebagai 'Absen'
         if (!existingAttendance) {
           await this.prisma.attendance.create({
             data: {
-              date: todayDate,
+              date: yesterdayISOString,
               status: AttendanceStatus.Absent,
               employee: { connect: { id: employee.id } },
             },
