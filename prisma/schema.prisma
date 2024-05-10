@@ -44,6 +44,7 @@ enum AttendanceStatus {
   Present
   Absent
   Leave
+  Half_day_leave
 }
 
 enum TaskStatus {
@@ -205,6 +206,8 @@ model LeaveRequest {
   start_date String
   end_date String 
   long_leave Int
+  start_time String?
+  end_time String?
   message String
   status LeaveStatus
 
@@ -327,10 +330,9 @@ model EmployeesOnAssignmentTemp {
 
 model SalarySlip {
   id Int @id @default(autoincrement())
-  month String
-  year String
-  bonus Int
-  allowance Int
+  month Int
+  year Int
+  basic_salary Int
   overtime Int
   total_cuts Int
   net_salary Int

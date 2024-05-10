@@ -111,20 +111,19 @@ export class LeaveRequestHodService {
                         },
                     });
 
-                    // Jika belum ada, buat catatan kehadiran baru dengan status 'Leave'
+                    const leaveStatus = leave.value === 1 ? 'Leave' : 'Half_day_leave';
                     if (!existingAttendance) {
                         await this.prisma.attendance.create({
                         data: {
                             date: currentDate.toISOString().split('T')[0],
-                            status: 'Leave',
+                            status: leaveStatus,
                             employee: { connect: { id: leaveRequest.employee_id } },
                         },
                         });
                     } else {
-                        // Jika sudah ada, update status ke 'Leave'
                         await this.prisma.attendance.update({
                         where: { id: existingAttendance.id },
-                        data: { status: 'Leave' },
+                        data: { status: leaveStatus },
                         });
                     }
                 }

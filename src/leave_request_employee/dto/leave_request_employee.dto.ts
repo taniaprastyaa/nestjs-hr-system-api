@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class LeaveRequestEmployeeDto {
     @ApiProperty({
@@ -17,6 +17,22 @@ export class LeaveRequestEmployeeDto {
     @IsString()
     @IsNotEmpty()
     end_date: string
+
+    @ApiProperty({
+        description: "The start time of half day leave",
+        example: "13:00",
+    })
+    @IsString()
+    @IsOptional()
+    start_time?: string
+
+    @ApiProperty({
+        description: "The end time of the half day leave",
+        example: "17:00",
+    })
+    @IsString()
+    @IsOptional()
+    end_time?: string
 
     @ApiProperty({
         description: "The message of the leave request",
