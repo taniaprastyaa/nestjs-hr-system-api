@@ -22,6 +22,7 @@ import { WorkShiftModule } from './work_shift/work_shift.module';
 import { HodAttendanceModule } from './hod_attendance/hod_attendance.module';
 import { EmployeeOvertimeModule } from './employee_overtime/employee_overtime.module';
 import { HodOvertimeModule } from './hod_overtime/hod_overtime.module';
+import { SalarySlipModule } from './salary_slip/salary_slip.module';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { HodOvertimeModule } from './hod_overtime/hod_overtime.module';
     EmployeeAttendanceModule,
     HodAttendanceModule,
     EmployeeOvertimeModule,
-    HodOvertimeModule
+    HodOvertimeModule,
+    SalarySlipModule
   ],
   providers: [
     {
