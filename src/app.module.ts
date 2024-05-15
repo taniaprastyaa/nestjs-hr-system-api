@@ -20,6 +20,8 @@ import { LeaveRequestHodModule } from './leave_request_hod/leave_request_hod.mod
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkShiftModule } from './work_shift/work_shift.module';
 import { HodAttendanceModule } from './hod_attendance/hod_attendance.module';
+import { EmployeeOvertimeModule } from './employee_overtime/employee_overtime.module';
+import { HodOvertimeModule } from './hod_overtime/hod_overtime.module';
 
 @Module({
   imports: [
@@ -43,7 +45,9 @@ import { HodAttendanceModule } from './hod_attendance/hod_attendance.module';
     LeaveRequestEmployeeModule,
     LeaveRequestHodModule,
     EmployeeAttendanceModule,
-    HodAttendanceModule
+    HodAttendanceModule,
+    EmployeeOvertimeModule,
+    HodOvertimeModule
   ],
   providers: [
     {

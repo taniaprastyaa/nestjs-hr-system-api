@@ -61,6 +61,12 @@ enum TaskPriority {
   Low
 }
 
+enum OvertimeStatus {
+  Pending
+  Approved
+  Rejected
+}
+
 model User {
   id Int @id @default(autoincrement())
   username String @unique
@@ -119,7 +125,8 @@ model Employee {
   salary_slips SalarySlip[]
   employee_tasks EmployeeTask[]
   assignedEmployees EmployeesOnAssignment[]
-    assignedEmployeesTemp EmployeesOnAssignmentTemp[]
+  assignedEmployeesTemp EmployeesOnAssignmentTemp[]
+  overtimes Overtime[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -327,6 +334,23 @@ model EmployeesOnAssignmentTemp {
   user User @relation(fields: [user_id], references: [id])
 
   @@map("employees_on_assignment_temp")
+}
+
+model Overtime {
+  id Int @id @default(autoincrement())
+  employee_id Int
+  employee Employee @relation(fields: [employee_id], references: [id])
+  date String
+  start_time String
+  end_time String
+  duration Float
+  reason String
+  status OvertimeStatus
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("overtimes")
 }
 
 model SalarySlip {
