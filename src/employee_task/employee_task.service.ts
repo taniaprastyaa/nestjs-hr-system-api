@@ -12,11 +12,26 @@ export class EmployeeTaskService {
 
     // Get all employee tasks
     async getAllEmployeeTasks() : Promise<ResponseFormatter> {
-        const employeeTasks = await this.prisma.employeeTask.findMany();
+        const employeeTasks = await this.prisma.employeeTask.findMany({
+            include: {
+                department: true,
+            }
+        });
+
+        const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+            where: {
+                employee_task_id: employeeTasks["id"]
+            },
+            include: {
+                employee: true,
+            }
+        });
+
+        const employeeTaskInfo = [employeeTasks, employeesOnAssignment];
 
         return ResponseFormatter.success(
             "EmployeeTask fetched successfully",
-            employeeTasks
+            employeeTaskInfo
         );
     }
 
@@ -26,6 +41,9 @@ export class EmployeeTaskService {
     ) : Promise<ResponseFormatter> {
         const employeeTask = await this.prisma.employeeTask.findUnique({
             where: employeeTaskWhereUniqueInput,
+            include: {
+                department: true,
+            }
         });
 
         const employeesOnAssignments = await this.prisma.employeesOnAssignment.findMany({
