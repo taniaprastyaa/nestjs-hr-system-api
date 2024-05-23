@@ -77,12 +77,17 @@ export class EmployeeTaskService {
     }
 
     // Store employee task to database
-    async createEmployeeTask(dto: EmployeeTaskDto) {
+    async createEmployeeTask(user_id: number, dto: EmployeeTaskDto) {
         try {
-            console.log(dto);
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            })
             const employeeTask = await this.prisma.employeeTask.create({
                 data: {
-                    ...dto
+                    ...dto,
+                    assigned_by: employee.id
                 }
             });
 

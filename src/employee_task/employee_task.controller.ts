@@ -37,7 +37,7 @@ export class EmployeeTaskController{
             throw new BadRequestException('Employee is still empty, please add employee first');
         }
 
-        const employeeTask = await this.employeeTaskService.createEmployeeTask(dto);
+        const employeeTask = await this.employeeTaskService.createEmployeeTask(user_id, dto);
 
         if(employeeTask) {
             let allAddedSuccessfully = true;

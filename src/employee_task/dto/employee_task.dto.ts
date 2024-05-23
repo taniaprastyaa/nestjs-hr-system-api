@@ -52,14 +52,6 @@ export class EmployeeTaskDto {
     priority: TaskPriority
 
     @ApiProperty({
-        description: "Employee who assign employee task",
-        example: 1,
-    })
-    @IsNumber()
-    @IsOptional()
-    assigned_by?: number
-
-    @ApiProperty({
         description: "The date the task was completed",
         example: "2024-04-12T06:21:50.923Z",
     })
