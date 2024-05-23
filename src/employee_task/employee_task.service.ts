@@ -11,29 +11,41 @@ export class EmployeeTaskService {
     constructor(private prisma: PrismaService) {}
 
     // Get all employee tasks
-    async getAllEmployeeTasks() : Promise<ResponseFormatter> {
-        const employeeTasks = await this.prisma.employeeTask.findMany({
+    async getAllEmployeeTasks(): Promise<ResponseFormatter> {
+        try {
+          const employeeTasks = await this.prisma.employeeTask.findMany({
             include: {
-                department: true,
-            }
-        });
-
-        const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
-            where: {
-                employee_task_id: employeeTasks["id"]
+              department: true,
             },
-            include: {
+          });
+      
+          const employeeTaskInfo = [];
+      
+          for (const task of employeeTasks) {
+            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+              where: {
+                employee_task_id: task.id,
+              },
+              include: {
                 employee: true,
-            }
-        });
-
-        const employeeTaskInfo = [employeeTasks, employeesOnAssignment];
-
-        return ResponseFormatter.success(
+              },
+            });
+      
+            employeeTaskInfo.push({
+              ...task,
+              employees: employeesOnAssignment.map((assignment) => assignment["employee"]),
+            });
+          }
+      
+          return ResponseFormatter.success(
             "EmployeeTask fetched successfully",
             employeeTaskInfo
-        );
-    }
+          );
+        } catch (err) {
+          throw new InternalServerErrorException('Failed to fetch employee tasks');
+        }
+      }
+      
 
     // Get employee task by id
     async getEmployeeTaskById(
