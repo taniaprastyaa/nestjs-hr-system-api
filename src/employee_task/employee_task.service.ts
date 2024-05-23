@@ -16,6 +16,7 @@ export class EmployeeTaskService {
           const employeeTasks = await this.prisma.employeeTask.findMany({
             include: {
               department: true,
+              employee: true
             },
           });
       
