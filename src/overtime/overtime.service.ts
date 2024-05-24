@@ -9,7 +9,11 @@ export class OvertimeService {
 
     // Get all employee overtimes
     async getAllEmployeeOvertimes() : Promise<ResponseFormatter> {
-        const overtimes = await this.prisma.overtime.findMany();
+        const overtimes = await this.prisma.overtime.findMany({
+            include: {
+                employee: true,
+            }
+        });
 
         return ResponseFormatter.success(
             "Overtime fetched successfully",
@@ -23,6 +27,9 @@ export class OvertimeService {
     ) : Promise<ResponseFormatter> {
         const overtime = await this.prisma.overtime.findUnique({
             where: overtimeWhereUniqueInput,
+            include: {
+                employee: true,
+            }
         });
 
         return ResponseFormatter.success(
