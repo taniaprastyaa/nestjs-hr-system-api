@@ -20,6 +20,24 @@ export class DepartmentDocumentService {
         );
     }
 
+    async getDepartmentDocumentsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        })
+        const departmentDocuments = await this.prisma.departmentDocument.findMany({
+            where: {
+                department_id: employee.department_id
+            }
+        });
+
+        return ResponseFormatter.success(
+            "Department document fetched successfully",
+            departmentDocuments
+        );
+    }
+
     // Get department document by id
     async getDepartmentDocumentById(
         departmentDocumentWhereUniqueInput: Prisma.DepartmentDocumentWhereUniqueInput,

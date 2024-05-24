@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UploadedFile } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { GetCurrentUserId } from "src/common/decorators";
 import { UploadDocument } from "src/common/decorators/upload-document.decorator";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { DepartmentDocumentService } from "./department_document.service";
@@ -10,11 +11,19 @@ import { CreateDepartmentDocumentDto, UpdateDepartmentDocumentDto } from "./dto"
 export class DepartmentDocumentController{
     constructor(private departmentDocumentService: DepartmentDocumentService) {}
 
-    // Get all deparments
+    // Get all department documents
     @ApiBearerAuth()
     @Get()
     getAllDeparmentDocuments() : Promise<ResponseFormatter> {
         return this.departmentDocumentService.getAllDepartmentDocuments();
+    }
+
+    @ApiBearerAuth()
+    @Get('department-document-per-department')
+    getDeparmentDocumentsPerDepartment(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.departmentDocumentService.getDepartmentDocumentsPerDepartment(user_id);
     }
 
     // Get department document by id
