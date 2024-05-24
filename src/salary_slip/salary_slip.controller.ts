@@ -4,8 +4,8 @@ import { ResponseFormatter } from "src/helpers/response.formatter";
 import { SalarySlipService } from "./salary_slip.service";
 import { GetCurrentUserId } from "src/common/decorators";
 
-@ApiTags("SalarySlip")
-@Controller('salarySlips')
+@ApiTags("Salary Slip")
+@Controller('salary_slip')
 export class SalarySlipController{
     constructor(private salarySlipService: SalarySlipService) {}
 
@@ -13,9 +13,24 @@ export class SalarySlipController{
     @ApiBearerAuth()
     @Get()
     getAllSalarySlips(
+    ) : Promise<ResponseFormatter> {
+        return this.salarySlipService.getAllSalarySlips();
+    }
+
+    @ApiBearerAuth()
+    @Get('salary-slip-per-department')
+    getAllSalarySlipsPerDepartment(
         @GetCurrentUserId() user_id: number
     ) : Promise<ResponseFormatter> {
-        return this.salarySlipService.getAllSalarySlip(user_id);
+        return this.salarySlipService.getAllSalarySlipsPerDepartment(user_id);
+    }
+
+    @ApiBearerAuth()
+    @Get('salary-slip-by-employee-id')
+    getAllSalarySlipsByEmployeeId(
+        @GetCurrentUserId() user_id: number
+    ) : Promise<ResponseFormatter> {
+        return this.salarySlipService.getAllSalarySlipsByEmployeeId(user_id);
     }
 
     // Get salarySlip by id

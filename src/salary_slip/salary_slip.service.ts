@@ -10,7 +10,16 @@ export class SalarySlipService {
     constructor(private prisma: PrismaService) {}
 
     // Get all salarySlips
-    async getAllSalarySlip(user_id: number) : Promise<ResponseFormatter> {
+    async getAllSalarySlips() : Promise<ResponseFormatter> {
+        const salarySlips = await this.prisma.salarySlip.findMany();
+
+        return ResponseFormatter.success(
+            "SalarySlip fetched successfully",
+            salarySlips
+        );
+    }
+
+    async getAllSalarySlipsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
         const hod = await this.prisma.employee.findFirst({
             where: {
                 user_id
@@ -27,6 +36,9 @@ export class SalarySlipService {
                       department_name: hod["department"].department_name
                     }
                 }
+            },
+            include: {
+              employee: true
             }
         });
 
@@ -35,6 +47,28 @@ export class SalarySlipService {
             salarySlips
         );
     }
+
+    async getAllSalarySlipsByEmployeeId(user_id: number) : Promise<ResponseFormatter> {
+      const employee = await this.prisma.employee.findFirst({
+          where: {
+              user_id
+          },
+      });
+
+      const salarySlips = await this.prisma.salarySlip.findMany({
+          where: {
+              employee_id: employee.id
+          },
+          include: {
+            employee: true
+          }
+      });
+
+      return ResponseFormatter.success(
+          "SalarySlip fetched successfully",
+          salarySlips
+      );
+  }
 
     // Get salarySlip by id
     async getSalarySlipById(
