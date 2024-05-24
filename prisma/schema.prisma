@@ -294,7 +294,7 @@ model EmployeeTask {
   id Int @id @default(autoincrement())
   task_title String
   task_description String
-  deadline DateTime
+  deadline String
   status TaskStatus
   
   department_id Int
@@ -303,7 +303,7 @@ model EmployeeTask {
   priority   TaskPriority
   assigned_by Int?
   employee Employee? @relation(fields: [assigned_by], references: [id])
-  completedAt DateTime?
+  completedAt String?
   notes      String?
   attachment String?
 
