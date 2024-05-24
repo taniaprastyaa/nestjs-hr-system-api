@@ -10,7 +10,11 @@ export class EmployeeOvertimeService {
 
     // Get all Employeeovertimes
     async getAllEmployeeOvertime() : Promise<ResponseFormatter> {
-        const employeeOvertimes = await this.prisma.overtime.findMany();
+        const employeeOvertimes = await this.prisma.overtime.findMany({
+            include: {
+                employee: true
+            }
+        });
 
         return ResponseFormatter.success(
             "EmployeeOvertime fetched successfully",
@@ -24,6 +28,9 @@ export class EmployeeOvertimeService {
     ) : Promise<ResponseFormatter> {
         const employeeOvertime = await this.prisma.overtime.findUnique({
             where: EmployeeovertimeWhereUniqueInput,
+            include: {
+                employee: true
+            }
         });
 
         return ResponseFormatter.success(
@@ -48,6 +55,9 @@ export class EmployeeOvertimeService {
                     duration,
                     status: "Pending",
                     employee_id: employee.id
+                },
+                include: {
+                    employee: true
                 }
             });
 
@@ -86,6 +96,9 @@ export class EmployeeOvertimeService {
                 data: {
                     ...dto,
                     duration
+                },
+                include: {
+                    employee: true
                 }
             });
 
