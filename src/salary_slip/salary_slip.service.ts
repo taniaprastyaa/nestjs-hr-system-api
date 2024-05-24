@@ -11,7 +11,11 @@ export class SalarySlipService {
 
     // Get all salarySlips
     async getAllSalarySlips() : Promise<ResponseFormatter> {
-        const salarySlips = await this.prisma.salarySlip.findMany();
+        const salarySlips = await this.prisma.salarySlip.findMany({
+          include: {
+            employee: true
+          }
+        });
 
         return ResponseFormatter.success(
             "SalarySlip fetched successfully",
