@@ -12,7 +12,11 @@ export class DepartmentDocumentService {
 
     // Get all department documents
     async getAllDepartmentDocuments() : Promise<ResponseFormatter> {
-        const departmentDocuments = await this.prisma.departmentDocument.findMany();
+        const departmentDocuments = await this.prisma.departmentDocument.findMany({
+            include: {
+                department: true
+            }
+        });
 
         return ResponseFormatter.success(
             "Department document fetched successfully",
@@ -53,11 +57,17 @@ export class DepartmentDocumentService {
     }
 
     // Store department document to database
-    async createDepartmentDocument(dto: CreateDepartmentDocumentDto) : Promise<ResponseFormatter> {
+    async createDepartmentDocument(dto: CreateDepartmentDocumentDto, user_id: number) : Promise<ResponseFormatter> {
         try {
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            })
             const department = await this.prisma.departmentDocument.create({
                 data: {
                     ...dto,
+                    department_id: employee.department_id
                 },
                 include: {
                     department: true
@@ -82,12 +92,18 @@ export class DepartmentDocumentService {
     async updateDepartmentDocument(params: {
         where: Prisma.DepartmentDocumentWhereUniqueInput;
         dto: UpdateDepartmentDocumentDto;
+        user_id: number
     }) : Promise<ResponseFormatter> {
         try {
-            const {where, dto} = params;
+            const {where, dto, user_id} = params;
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            })
             const department = await this.prisma.departmentDocument.update({
                 where,
-                data: {...dto,},
+                data: {...dto, department_id: employee.department_id},
                 include: {
                     department: true
                 },

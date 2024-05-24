@@ -40,11 +40,12 @@ export class DepartmentDocumentController{
     @ApiConsumes('multipart/form-data')
     @ApiBody({type: CreateDepartmentDocumentDto})
     async createDepartmentDocument(
+        @GetCurrentUserId() user_id: number,
         @Body() dto: CreateDepartmentDocumentDto,
         @UploadedFile() document_file: Express.Multer.File,
     ) : Promise<ResponseFormatter> {
         dto.document_file = document_file.filename;
-        return this.departmentDocumentService.createDepartmentDocument(dto);
+        return this.departmentDocumentService.createDepartmentDocument(dto, user_id);
     }
 
     // Update department document in database
@@ -55,6 +56,7 @@ export class DepartmentDocumentController{
     @ApiBody({type: UpdateDepartmentDocumentDto})
     async updateDepartmentDocument(
         @Param('id') id: string,
+        @GetCurrentUserId() user_id: number,
         @Body() dto: UpdateDepartmentDocumentDto,
         @UploadedFile() document_file: Express.Multer.File,
     ) : Promise<ResponseFormatter> {
@@ -64,7 +66,8 @@ export class DepartmentDocumentController{
 
         return this.departmentDocumentService.updateDepartmentDocument({
             where: {id: Number(id)},
-            dto
+            dto,
+            user_id
         })
     }
 

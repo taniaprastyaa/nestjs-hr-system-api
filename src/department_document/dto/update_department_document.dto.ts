@@ -27,13 +27,4 @@ export class UpdateDepartmentDocumentDto {
     @IsString()
     @IsNotEmpty()
     description: string
-
-    @ApiProperty({
-        description: "The id of the department",
-        example: 1,
-    })
-    @Transform(({ value }) => parseInt(value))
-    @IsNumber()
-    @IsNotEmpty()
-    department_id: number
 }
