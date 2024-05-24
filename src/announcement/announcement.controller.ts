@@ -14,9 +14,16 @@ export class AnnouncementController{
     @ApiBearerAuth()
     @Get()
     getAllAnnouncements(
+    ) : Promise<ResponseFormatter> {
+        return this.announcementService.getAllAnnouncements();
+    }
+
+    @ApiBearerAuth()
+    @Get('announcement-per-department')
+    getAllAnnouncementsPerDepartment(
         @GetCurrentUserId() user_id: number,
     ) : Promise<ResponseFormatter> {
-        return this.announcementService.getAllAnnouncement(user_id);
+        return this.announcementService.getAllAnnouncementsPerDepartment(user_id);
     }
 
     // Get announcement by id
