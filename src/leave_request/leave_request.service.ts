@@ -9,7 +9,11 @@ export class LeaveRequestService {
 
     // Get all leaveRequests
     async getAllLeaveRequest() : Promise<ResponseFormatter> {
-        const leaveRequests = await this.prisma.leaveRequest.findMany();
+        const leaveRequests = await this.prisma.leaveRequest.findMany({
+            include: {
+                employee: true,
+            }
+        });
 
         return ResponseFormatter.success(
             "Leave request fetched successfully",
@@ -23,6 +27,9 @@ export class LeaveRequestService {
     ) : Promise<ResponseFormatter> {
         const leaveRequest = await this.prisma.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
+            include: {
+                employee: true,
+            }
         });
 
         return ResponseFormatter.success(
