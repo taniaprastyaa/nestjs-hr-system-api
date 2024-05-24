@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { EmployeeWorkShiftService } from "./employee_work_shift.service";
 import { EmployeeWorkShiftDto } from "./dto";
+import { GetCurrentUserId } from "src/common/decorators";
 
 @ApiTags("Employee Work Shift")
 @Controller('employee_work_shifts')
@@ -13,7 +14,23 @@ export class EmployeeWorkShiftController{
     @ApiBearerAuth()
     @Get()
     getAllEmployeeWorkShifts() : Promise<ResponseFormatter> {
-        return this.employeeWorkShiftService.getAllEmployeeWorkShift();
+        return this.employeeWorkShiftService.getAllEmployeeWorkShifts();
+    }
+
+    @ApiBearerAuth()
+    @Get('employee-work-shift-per-department')
+    getEmployeeWorkShiftsPerDepartment(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.employeeWorkShiftService.getEmployeeWorkShiftsPerDepartment(user_id);
+    }
+
+    @ApiBearerAuth()
+    @Get('employee-work-shift-by-id')
+    getEmployeeWorkShift(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.employeeWorkShiftService.getEmployeeWorkShift(user_id);
     }
 
     // Get employee work shift by id

@@ -9,7 +9,7 @@ export class EmployeeWorkShiftService {
     constructor(private prisma: PrismaService) {}
 
     // Get all employee work shifts
-    async getAllEmployeeWorkShift() : Promise<ResponseFormatter> {
+    async getAllEmployeeWorkShifts() : Promise<ResponseFormatter> {
         const employeeWorkShifts = await this.prisma.employeeWorkShift.findMany(
             {
                 include: {
@@ -24,6 +24,59 @@ export class EmployeeWorkShiftService {
             employeeWorkShifts
         );
     }
+
+    async getEmployeeWorkShiftsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+        
+        const employeeWorkShifts = await this.prisma.employeeWorkShift.findMany(
+            {
+                where: {
+                    employee: {
+                        department_id: employee.department_id
+                    }
+                },
+                include: {
+                  employee: true,
+                  shift: true,
+                },
+            },
+        );
+
+        return ResponseFormatter.success(
+            "Employee Work shift fetched successfully",
+            employeeWorkShifts
+        );
+    }
+
+    async getEmployeeWorkShift(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+        
+        const employeeWorkShifts = await this.prisma.employeeWorkShift.findFirst(
+            {
+                where: {
+                    employee_id: employee.id
+                },
+                include: {
+                  employee: true,
+                  shift: true,
+                },
+            },
+        );
+
+        return ResponseFormatter.success(
+            "Employee Work shift fetched successfully",
+            employeeWorkShifts
+        );
+    }
+
 
     // Get employee work shift by id
     async getEmployeeWorkShiftById(
