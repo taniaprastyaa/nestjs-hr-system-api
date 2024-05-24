@@ -13,6 +13,9 @@ export class LeaveRequestEmployeeService {
         const leaveRequestEmployees = await this.prisma.leaveRequest.findMany({
             where:{
                 employee_id
+            },
+            include: {
+                employee: true
             }
         });
 
@@ -29,7 +32,7 @@ export class LeaveRequestEmployeeService {
         const employee = await this.prisma.employee.findMany({
             where: {
                 user_id
-            },
+            }
         });
 
         return employee;
@@ -41,6 +44,9 @@ export class LeaveRequestEmployeeService {
     ) : Promise<ResponseFormatter> {
         const leaveRequestEmployee = await this.prisma.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
+            include: {
+                employee: true
+            }
         });
 
         return ResponseFormatter.success(
@@ -61,6 +67,9 @@ export class LeaveRequestEmployeeService {
                     long_leave: longLeave,
                     status: "Pending",
                     employee_id: employee_id
+                },
+                include: {
+                    employee: true
                 }
             });
 
@@ -100,7 +109,10 @@ export class LeaveRequestEmployeeService {
                 data: {
                         ...dto,
                         long_leave: longLeave
-                    }
+                },
+                include: {
+                    employee: true
+                }
             });
 
             return ResponseFormatter.success(
@@ -127,6 +139,9 @@ export class LeaveRequestEmployeeService {
 
             const leaveRequestEmployee = await this.prisma.leaveRequest.delete({
                 where,
+                include: {
+                    employee: true
+                }
             });
 
             return ResponseFormatter.success(
