@@ -25,6 +25,7 @@ import { HodOvertimeModule } from './hod_overtime/hod_overtime.module';
 import { SalarySlipModule } from './salary_slip/salary_slip.module';
 import { DepartmentDocumentModule } from './department_document/department_document.module';
 import { LeaveRequestModule } from './leave_request/leave_request.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { LeaveRequestModule } from './leave_request/leave_request.module';
     HodOvertimeModule,
     SalarySlipModule,
     DepartmentDocumentModule,
-    LeaveRequestModule
+    LeaveRequestModule,
+    AttendanceModule
   ],
   providers: [
     {
