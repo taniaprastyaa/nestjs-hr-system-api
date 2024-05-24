@@ -17,6 +17,22 @@ export class EmployeeTaskController{
         return this.employeeTaskService.getAllEmployeeTasks();
     }
 
+    @ApiBearerAuth()
+    @Get('employee-task-per-department')
+    getEmployeeTasksPerDepartment(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.employeeTaskService.getEmployeeTasksPerDepartment(user_id);
+    }
+
+    @ApiBearerAuth()
+    @Get('employee-task-per-employee')
+    getEmployeeTasks(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.employeeTaskService.getEmployeeTasks(user_id);
+    }
+
     // Get employee task by id
     @ApiBearerAuth()
     @Get(':id')

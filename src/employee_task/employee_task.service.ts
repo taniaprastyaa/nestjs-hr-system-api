@@ -45,8 +45,104 @@ export class EmployeeTaskService {
         } catch (err) {
           throw new InternalServerErrorException('Failed to fetch employee tasks');
         }
-      }
+    }
+     
+    async getEmployeeTasksPerDepartment(user_id: number): Promise<ResponseFormatter> {
+        try {
+          const employee = await this.prisma.employee.findFirst({
+              where: {
+                  user_id
+              }
+          });
+
+          const employeeTasks = await this.prisma.employeeTask.findMany({
+            where: {
+                department_id: employee.department_id
+            },
+            include: {
+              department: true,
+              employee: true
+            },
+          });
       
+          const employeeTaskInfo = [];
+      
+          for (const task of employeeTasks) {
+            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+              where: {
+                employee_task_id: task.id,
+              },
+              include: {
+                employee: true,
+              },
+            });
+      
+            employeeTaskInfo.push({
+              ...task,
+              employees: employeesOnAssignment.map((assignment) => assignment["employee"]),
+            });
+          }
+      
+          return ResponseFormatter.success(
+            "EmployeeTask fetched successfully",
+            employeeTaskInfo
+          );
+        } catch (err) {
+          throw new InternalServerErrorException('Failed to fetch employee tasks');
+        }
+    }
+
+    async getEmployeeTasks(user_id: number): Promise<ResponseFormatter> {
+        try {
+          const employee = await this.prisma.employee.findFirst({
+              where: {
+                  user_id
+              }
+          });
+
+          const employeeTasks = await this.prisma.employeeTask.findMany({
+            where: {
+                assignedEmployees: {
+                    some: {
+                        employee_id: employee.id
+                    }
+                }
+            },
+            include: {
+                assignedEmployees: {
+                    include: {
+                        employee: true
+                    }
+                }
+            }
+        });        
+      
+          const employeeTaskInfo = [];
+      
+          for (const task of employeeTasks) {
+            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+              where: {
+                employee_task_id: task.id,
+              },
+              include: {
+                employee: true,
+              },
+            });
+      
+            employeeTaskInfo.push({
+              ...task,
+              employees: employeesOnAssignment.map((assignment) => assignment["employee"]),
+            });
+          }
+      
+          return ResponseFormatter.success(
+            "EmployeeTask fetched successfully",
+            employeeTaskInfo
+          );
+        } catch (err) {
+          throw new InternalServerErrorException('Failed to fetch employee tasks');
+        }
+    }
 
     // Get employee task by id
     async getEmployeeTaskById(
