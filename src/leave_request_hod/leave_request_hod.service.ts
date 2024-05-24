@@ -19,7 +19,8 @@ export class LeaveRequestHodService {
               }
             },
             include: {
-                employee: true
+                employee: true,
+                leave: true
             }
           });
 
@@ -52,7 +53,8 @@ export class LeaveRequestHodService {
         const leaveRequest = await this.prisma.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
             include: {
-                employee: true
+                employee: true,
+                leave: true
             }
         });
 
