@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import { GetCurrentUserId } from 'src/common/decorators';
 
 @ApiTags("Employee")
 @Controller('employees')
@@ -12,8 +13,17 @@ export class EmployeeController {
     // Get all employees
     @ApiBearerAuth()
     @Get()
-    getAllEmployees(): Promise<ResponseFormatter> {
+    getAllEmployees(
+    ): Promise<ResponseFormatter> {
         return this.employeeService.getAllEmployees();
+    }
+
+    @ApiBearerAuth()
+    @Get('employee-per-department')
+    getAllEmployeesPerDepartment(
+        @GetCurrentUserId() user_id: number,
+    ): Promise<ResponseFormatter> {
+        return this.employeeService.getAllEmployeesPerDepartment(user_id);
     }
 
     // Get employee by id

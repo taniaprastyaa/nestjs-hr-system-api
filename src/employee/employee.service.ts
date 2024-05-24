@@ -25,6 +25,29 @@ export class EmployeeService {
         )
     }
 
+    async getAllEmployeesPerDepartment(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        })
+        const employees = await this.prisma.employee.findMany({
+            where: {
+                department_id: employee.department_id
+            },
+            include: {
+              user: true,
+              department: true,
+              position: true
+            },
+        });
+
+        return ResponseFormatter.success(
+            "Employees fetched successfully",
+            employees
+        )
+    }
+
     // Get employee by id 
     async getEmployeeById(
         employeeWhereUniqueInput: Prisma.EmployeeWhereUniqueInput,
