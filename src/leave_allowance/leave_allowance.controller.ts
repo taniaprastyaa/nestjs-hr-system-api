@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResponseFormatter } from "src/helpers/response.formatter";
 import { LeaveAllowanceService } from "./leave_allowance.service";
 import { CreateLeaveAllowanceDto, UpdateLeaveAllowanceDto } from "./dto";
+import { GetCurrentUserId } from "src/common/decorators";
 
 @ApiTags("Leave Allowance")
 @Controller('leave_allowance')
@@ -14,6 +15,22 @@ export class LeaveAllowanceController{
     @Get()
     getAllLeaveAllowances() : Promise<ResponseFormatter> {
         return this.leaveAllowanceService.getAllLeaveAllowances();
+    }
+
+    @ApiBearerAuth()
+    @Get('leave-allowance-per-department')
+    getLeaveAllowancesPerDepartment(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.leaveAllowanceService.getLeaveAllowancesPerDepartment(user_id);
+    }
+
+    @ApiBearerAuth()
+    @Get('leave-allowance-per-employee')
+    getLeaveAllowancesPerEmployee(
+        @GetCurrentUserId() user_id: number,
+    ) : Promise<ResponseFormatter> {
+        return this.leaveAllowanceService.getLeaveAllowancesPerEmployee(user_id);
     }
 
     // Get leaveAllowance by id

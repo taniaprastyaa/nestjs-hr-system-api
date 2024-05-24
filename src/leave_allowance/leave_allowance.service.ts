@@ -23,6 +23,52 @@ export class LeaveAllowanceService {
         );
     }
 
+    async getLeaveAllowancesPerDepartment(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+
+        const leaveAllowances = await this.prisma.leaveAllowance.findMany({
+            where: {
+                employee: {
+                    department_id: employee.department_id
+                }
+            },
+            include: {
+                employee: true
+            }
+        });        
+
+        return ResponseFormatter.success(
+            "Leave Allowance fetched successfully",
+            leaveAllowances
+        );
+    }
+
+    async getLeaveAllowancesPerEmployee(user_id: number) : Promise<ResponseFormatter> {
+        const employee = await this.prisma.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+        
+        const leaveAllowances = await this.prisma.leaveAllowance.findMany({
+            where: {
+                employee_id: employee.id
+            },
+            include: {
+                employee: true
+            },
+        });
+
+        return ResponseFormatter.success(
+            "Leave Allowance fetched successfully",
+            leaveAllowances
+        );
+    }
+
     // Get leaveAllowance by id
     async getLeaveAllowanceById(
         leaveAllowanceWhereUniqueInput: Prisma.LeaveAllowanceWhereUniqueInput,
