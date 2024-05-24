@@ -80,6 +80,9 @@ export class SalarySlipService {
     ) : Promise<ResponseFormatter> {
         const salarySlip = await this.prisma.salarySlip.findUnique({
             where: salarySlipWhereUniqueInput,
+            include: {
+              employee: true,
+            }
         });
 
         return ResponseFormatter.success(
