@@ -26,6 +26,9 @@ export class HodOvertimeService {
                         department_name: employee["department"].department_name
                     }
                 }
+            },
+            include: {
+                employee: true
             }
         });
 
@@ -41,6 +44,9 @@ export class HodOvertimeService {
     ) : Promise<ResponseFormatter> {
         const hodOvertime = await this.prisma.overtime.findUnique({
             where: overtimeWhereUniqueInput,
+            include: {
+                employee: true
+            }
         });
 
         return ResponseFormatter.success(
