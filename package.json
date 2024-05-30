@@ -27,6 +27,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.1",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^7.3.0",
     "@prisma/client": "^5.10.2",
     "argon2": "^0.40.1",
@@ -35,7 +36,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "serve-static": "^1.15.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

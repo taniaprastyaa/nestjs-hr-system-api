@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UploadedFile } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { GetCurrentUserId } from "src/common/decorators";
 import { UploadDocument } from "src/common/decorators/upload-document.decorator";
@@ -9,28 +10,44 @@ import { CreateDepartmentDocumentDto, UpdateDepartmentDocumentDto } from "./dto"
 @ApiTags("Department Document")
 @Controller('department_document')
 export class DepartmentDocumentController{
-    constructor(private departmentDocumentService: DepartmentDocumentService) {}
+    constructor(
+        private departmentDocumentService: DepartmentDocumentService,
+        private configService: ConfigService,
+    ) {}
+
+    private formatDocumentUrl(document) {
+        return {
+            ...document,
+            document_file: `${this.configService.get('BASE_URL')}/department_documents/${document.document_file}`,
+        };
+    }
 
     // Get all department documents
     @ApiBearerAuth()
     @Get()
-    getAllDeparmentDocuments() : Promise<ResponseFormatter> {
-        return this.departmentDocumentService.getAllDepartmentDocuments();
+    async getAllDeparmentDocuments() : Promise<ResponseFormatter> {
+        const response = await this.departmentDocumentService.getAllDepartmentDocuments();
+        response["data"] = response["data"].map(this.formatDocumentUrl.bind(this));
+        return response;
     }
 
     @ApiBearerAuth()
     @Get('department-document-per-department')
-    getDeparmentDocumentsPerDepartment(
+    async getDeparmentDocumentsPerDepartment(
         @GetCurrentUserId() user_id: number,
     ) : Promise<ResponseFormatter> {
-        return this.departmentDocumentService.getDepartmentDocumentsPerDepartment(user_id);
+        const response = await this.departmentDocumentService.getDepartmentDocumentsPerDepartment(user_id);
+        response["data"] = response["data"].map(this.formatDocumentUrl.bind(this));
+        return response;
     }
 
     // Get department document by id
     @ApiBearerAuth()
     @Get(':id')
-    getDepartmentDocument(@Param('id') id: string) : Promise<ResponseFormatter> {
-        return this.departmentDocumentService.getDepartmentDocumentById({id: Number(id)});
+    async getDepartmentDocument(@Param('id') id: string) : Promise<ResponseFormatter> {
+        const response = await this.departmentDocumentService.getDepartmentDocumentById({id: Number(id)});
+        response["data"] = this.formatDocumentUrl(response["data"]);
+        return response;
     }
 
     // Store department document to database

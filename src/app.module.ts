@@ -27,11 +27,17 @@ import { DepartmentDocumentModule } from './department_document/department_docum
 import { LeaveRequestModule } from './leave_request/leave_request.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { OvertimeModule } from './overtime/overtime.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'assets/department_document'),
+      serveRoot: '/department_documents',
     }),
     AuthModule, 
     PrismaModule,
