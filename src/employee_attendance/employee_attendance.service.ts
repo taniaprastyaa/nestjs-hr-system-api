@@ -21,6 +21,9 @@ export class EmployeeAttendanceService {
         const attendances = await this.prisma.attendance.findMany({
             where: {
                 employee_id: employee[0].id
+            },
+            include: {
+                employee: true
             }
         });
 
@@ -36,6 +39,9 @@ export class EmployeeAttendanceService {
     ) : Promise<ResponseFormatter> {
         const attendance = await this.prisma.attendance.findUnique({
             where: attendanceWhereUniqueInput,
+            include: {
+                employee: true
+            }
         });
 
         return ResponseFormatter.success(
