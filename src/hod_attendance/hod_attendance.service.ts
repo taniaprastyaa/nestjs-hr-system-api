@@ -30,6 +30,9 @@ export class HodAttendanceService {
                     department_name: department
                   }
                 }
+            },
+            include: {
+              employee: true
             }
         });
 
@@ -45,6 +48,9 @@ export class HodAttendanceService {
     ) : Promise<ResponseFormatter> {
         const attendance = await this.prisma.attendance.findUnique({
             where: attendanceWhereUniqueInput,
+            include: {
+              employee: true
+            }
         });
 
         return ResponseFormatter.success(
@@ -75,7 +81,7 @@ export class HodAttendanceService {
         department: {
           department_name: department
         }
-      }
+      },
     });
   
       for (const employee of employees) {
@@ -84,6 +90,9 @@ export class HodAttendanceService {
             date: yesterdayISOString,
             employee_id: employee.id,
           },
+          include: {
+            employee: true
+          }
         });
   
         if (!existingAttendance) {
@@ -111,6 +120,7 @@ export class HodAttendanceService {
                 employee_id: dto.employee_id
             },
             include: {
+                employee: true,
                 shift: true
             }
         });
@@ -121,6 +131,9 @@ export class HodAttendanceService {
               data: {
                 ...dto,
                delay_minutes: delayMinutes
+              },
+              include: {
+                employee: true
               }
           });
 
@@ -143,6 +156,9 @@ export class HodAttendanceService {
       try {
           const attendance = await this.prisma.attendance.delete({
               where,
+              include: {
+                employee: true
+              }
           });
 
           return ResponseFormatter.success(
