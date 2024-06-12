@@ -67,6 +67,11 @@ enum OvertimeStatus {
   Rejected
 }
 
+enum AnnouncementType {
+  per_department
+  general
+}
+
 model User {
   id Int @id @default(autoincrement())
   username String @unique
@@ -184,6 +189,7 @@ model Announcement {
   title String
   content String 
   date String
+  announcement_type AnnouncementType @default(general)
   
   department_id Int?
   department Department? @relation(fields: [department_id], references: [id])
