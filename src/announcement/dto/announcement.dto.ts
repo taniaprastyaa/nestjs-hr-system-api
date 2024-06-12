@@ -28,7 +28,7 @@ export class AnnouncementDto {
 
     @ApiProperty({
         description: "The department of the announcement",
-        example: 0,
+        example: null,
     })
     @IsNumber()
     @IsNotEmpty()

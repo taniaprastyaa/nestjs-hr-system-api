@@ -82,7 +82,6 @@ export class AnnouncementService {
     // Store announcement to database
     async createAnnouncement(dto: AnnouncementDto) : Promise<ResponseFormatter> {
         try {
-            dto.department_id = (dto.department_id === 0) ? null : dto.department_id;
             const announcement = await this.prisma.announcement.create({
                 data: {
                     ...dto,
