@@ -37,9 +37,10 @@ export class AnnouncementController{
     @ApiBearerAuth()
     @Post()
     async createAnnouncement(
-        @Body() dto: AnnouncementDto
+        @GetCurrentUserId() userId: number,
+        @Body() dto: AnnouncementDto,
     ) : Promise<ResponseFormatter> {
-        return this.announcementService.createAnnouncement(dto);
+        return this.announcementService.createAnnouncement(dto, userId);
     }
 
     // Update announcement in database
@@ -47,11 +48,13 @@ export class AnnouncementController{
     @Put(':id')
     async updateAnnouncement(
         @Param('id') id: string,
+        @GetCurrentUserId() userId: number,
         @Body() dto: AnnouncementDto
     ) : Promise<ResponseFormatter> {
         return this.announcementService.updateAnnouncement({
             where: {id: Number(id)},
-            dto
+            dto,
+            user_id: userId
         })
     }
 

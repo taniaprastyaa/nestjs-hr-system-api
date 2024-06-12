@@ -80,11 +80,24 @@ export class AnnouncementService {
     }
 
     // Store announcement to database
-    async createAnnouncement(dto: AnnouncementDto) : Promise<ResponseFormatter> {
+    async createAnnouncement(dto: AnnouncementDto, user_id: number) : Promise<ResponseFormatter> {
         try {
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            });
+
+            let department_id = null;
+            
+            if(dto["announcement_type"] === "per_department"){
+                department_id = employee.department_id;
+            }
+
             const announcement = await this.prisma.announcement.create({
                 data: {
                     ...dto,
+                    department_id
                 }
             });
 
@@ -106,13 +119,29 @@ export class AnnouncementService {
     async updateAnnouncement(params: {
         where: Prisma.AnnouncementWhereUniqueInput;
         dto: AnnouncementDto;
+        user_id: number;
     }) : Promise<ResponseFormatter> {
         try {
-            const {where, dto} = params;
-            dto.department_id = (dto.department_id === 0) ? null : dto.department_id;
+            const {where, dto, user_id} = params;
+
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            });
+
+            let department_id = null;
+            
+            if(dto["announcement_type"] === "per_department"){
+                department_id = employee.department_id;
+            }
+
             const announcement = await this.prisma.announcement.update({
                 where,
-                data: {...dto,}
+                data: {
+                    ...dto,
+                    department_id
+                }
             });
 
             return ResponseFormatter.success(

@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { AnnouncementType } from "@prisma/client";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class AnnouncementDto {
@@ -28,9 +29,9 @@ export class AnnouncementDto {
 
     @ApiProperty({
         description: "The department of the announcement",
-        example: null,
+        enum: ['general', 'per_department'],
     })
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    department_id: number
+    announcement_type: AnnouncementType
 }
