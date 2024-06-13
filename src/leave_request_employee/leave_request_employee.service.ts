@@ -15,7 +15,8 @@ export class LeaveRequestEmployeeService {
                 employee_id
             },
             include: {
-                employee: true
+                employee: true,
+                leave: true
             }
         });
 
@@ -45,7 +46,8 @@ export class LeaveRequestEmployeeService {
         const leaveRequestEmployee = await this.prisma.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
             include: {
-                employee: true
+                employee: true,
+                leave: true
             }
         });
 
