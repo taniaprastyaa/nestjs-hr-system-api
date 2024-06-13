@@ -182,22 +182,54 @@ export class EmployeeTaskService {
             })
             const employeeTask = await this.prisma.employeeTask.create({
                 data: {
-                    ...dto,
+                    task_title: dto.task_description,
+                    task_description: dto.task_description,
+                    deadline: dto.deadline,
+                    status: dto.status,
+                    department_id: dto.department_id,
+                    priority: dto.priority,
+                    completedAt: dto.completedAt,
+                    notes: dto.notes,
+                    attachment: dto.attachment,
                     assigned_by: employee.id
                 }
             });
-
+    
+            for (const employee_id of dto.employee_on_assignment_ids) {
+                const employeeExists = await this.prisma.employee.findUnique({
+                    where: {
+                        id: employee_id
+                    }
+                });
+    
+                if (employeeExists) {
+                    await this.prisma.employeesOnAssignment.create({
+                        data: {
+                            employee_id,
+                            employee_task_id: employeeTask.id
+                        }
+                    });
+                } else {
+                    throw new BadRequestException(`Employee with ID ${employee_id} does not exist`);
+                }
+            }
+    
             return employeeTask;
         } catch (err) {
             logger.error('Error creating employee task:', err);
 
+            if (err instanceof BadRequestException) {
+                throw err;
+            }
+    
             if(err.code === 'P2002') {
                 throw new BadRequestException('Employee Task already exist');
             }
     
             throw new InternalServerErrorException('Employee Task failed to create');
         }
-    } 
+    }
+    
 
     // Update employee task in database
     async updateEmployeeTask(params: {
@@ -256,21 +288,6 @@ export class EmployeeTaskService {
         }
     }
 
-    // Get all employees on assignment
-    async getAllEmployeesOnAssignment(user_id: number) {
-        const employeesOnAssignment = await this.prisma.employeesOnAssignmentTemp.findMany({
-            where: {
-                user_id
-            },
-            include: {
-                employee: true,
-            }
-        });
-
-        return (employeesOnAssignment.length === 0) ? false : employeesOnAssignment;
-        ;
-    }
-
     // Store employee on assigment
     async addEmployeesOnAssignment(
         employee_id: number,
@@ -287,24 +304,6 @@ export class EmployeeTaskService {
         } catch (error) {
         // Handle error here if necessary
         throw new InternalServerErrorException('Failed to add employee on assignment');
-        }
-    }
-
-    // Delete all employees on assignment temp
-    async clearEmployeesOnAssignmentTemp( user_id: number) : Promise<ResponseFormatter> {
-        try {
-            const employeesOnAssignment = await this.prisma.employeesOnAssignmentTemp.deleteMany({
-                where: {
-                    user_id: user_id
-                }
-            });
-
-            return ResponseFormatter.success(
-                "Employee Task deleted successfully",
-                employeesOnAssignment
-            );
-        } catch (err) {
-            throw new InternalServerErrorException('Employee Task failed to delete');
         }
     }
 }

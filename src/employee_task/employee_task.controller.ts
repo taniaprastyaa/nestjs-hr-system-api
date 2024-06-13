@@ -47,39 +47,8 @@ export class EmployeeTaskController{
         @GetCurrentUserId() user_id: number,
         @Body() dto: EmployeeTaskDto
     ) {
-        const employeesOnAssignment = await this.employeeTaskService.getAllEmployeesOnAssignment(user_id);
+        return this.employeeTaskService.createEmployeeTask(user_id, dto);
 
-        if (!employeesOnAssignment) {
-            throw new BadRequestException('Employee is still empty, please add employee first');
-        }
-
-        const employeeTask = await this.employeeTaskService.createEmployeeTask(user_id, dto);
-
-        if(employeeTask) {
-            let allAddedSuccessfully = true;
-    
-            for (const employeeOnAssignment of employeesOnAssignment) {
-                try {
-                    await this.employeeTaskService.addEmployeesOnAssignment(
-                        employeeOnAssignment.employee_id,
-                        employeeTask.id,                        
-                    );
-                } catch (err) {
-                    console.error('Error adding transaction detail:', err);
-                    allAddedSuccessfully = false;
-                    break;
-                }
-            }
-    
-            if (allAddedSuccessfully) {
-                const employeesOnAssignmentTemp = await this.employeeTaskService.clearEmployeesOnAssignmentTemp(user_id);
-                return employeeTask;
-            } else {
-                throw new InternalServerErrorException('Failed to add some employees to employees on assignment');
-            }
-        } else {
-            throw new InternalServerErrorException('Employee task failed to create');
-        }
     }
 
     // Update employee task in database

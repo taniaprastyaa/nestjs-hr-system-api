@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { TaskStatus, TaskPriority } from "@prisma/client";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class EmployeeTaskDto {
     @ApiProperty({
@@ -74,4 +74,14 @@ export class EmployeeTaskDto {
     @IsString()
     @IsOptional()
     attachment?: string
+
+    @ApiProperty({
+        description: "List of employee IDs assigned to the task",
+        example: [1, 2, 3],
+    })
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsNumber({}, { each: true })
+    @IsNotEmpty()
+    employee_on_assignment_ids: number[]
 }
