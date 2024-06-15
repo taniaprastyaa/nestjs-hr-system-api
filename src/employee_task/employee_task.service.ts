@@ -235,25 +235,83 @@ export class EmployeeTaskService {
     async updateEmployeeTask(params: {
         where: Prisma.EmployeeTaskWhereUniqueInput;
         dto: EmployeeTaskDto;
-    }) : Promise<ResponseFormatter> {
+        user_id: number;
+    }): Promise<ResponseFormatter> {
         try {
-            const {where, dto} = params;
+            const { where, dto, user_id } = params;
+
+            const employee = await this.prisma.employee.findFirst({
+                where: {
+                    user_id
+                }
+            })
+    
+            const existingTask = await this.prisma.employeeTask.findUnique({
+                where,
+                include: {
+                    assignedEmployees: true,
+                }
+            });
+    
+            if (!existingTask) {
+                throw new BadRequestException('Employee Task not found');
+            }
+    
+            // Delete existing assigned employees
+            await this.prisma.employeesOnAssignment.deleteMany({
+                where: {
+                    employee_task_id: existingTask.id,
+                }
+            });
+    
+            // Update the employee task
             const employeeTask = await this.prisma.employeeTask.update({
                 where,
-                data: {...dto,}
+                data: {
+                    task_title: dto.task_description,
+                    task_description: dto.task_description,
+                    deadline: dto.deadline,
+                    status: dto.status,
+                    department_id: dto.department_id,
+                    priority: dto.priority,
+                    completedAt: dto.completedAt,
+                    notes: dto.notes,
+                    attachment: dto.attachment,
+                    assigned_by: employee["id"]
+                }
             });
-
+    
+            // Add new assigned employees
+            for (const employee_id of dto.employee_on_assignment_ids) {
+                const employeeExists = await this.prisma.employee.findUnique({
+                    where: {
+                        id: employee_id
+                    }
+                });
+    
+                if (employeeExists) {
+                    await this.prisma.employeesOnAssignment.create({
+                        data: {
+                            employee_id,
+                            employee_task_id: employeeTask.id
+                        }
+                    });
+                } else {
+                    throw new BadRequestException(`Employee with ID ${employee_id} does not exist`);
+                }
+            }
+    
             return ResponseFormatter.success(
                 "Employee Task updated successfully",
                 employeeTask
             );
         } catch (err) {
             logger.error('Error updating employee task:', err);
-
-            if(err.code === 'P2002') {
-                throw new BadRequestException('EmployeeTask already exist');
+    
+            if (err.code === 'P2002') {
+                throw new BadRequestException('Employee Task already exists');
             }
-
+    
             throw new InternalServerErrorException('Employee Task failed to update');
         }
     }

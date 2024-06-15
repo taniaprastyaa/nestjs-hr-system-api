@@ -56,11 +56,13 @@ export class EmployeeTaskController{
     @Put(':id')
     async updateEmployeeTask(
         @Param('id') id: string,
+        @GetCurrentUserId() user_id: number,
         @Body() dto: EmployeeTaskDto
     ) : Promise<ResponseFormatter> {
         return this.employeeTaskService.updateEmployeeTask({
             where: {id: Number(id)},
-            dto
+            dto,
+            user_id: user_id
         })
     }
 
