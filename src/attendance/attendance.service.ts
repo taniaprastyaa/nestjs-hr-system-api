@@ -11,7 +11,7 @@ export class AttendanceService {
 
     // Get all attendances
     async getAllAttendance() : Promise<ResponseFormatter> {
-        const attendances = await this.prisma.attendance.findMany({
+        const attendances = await this.prisma.client.attendance.findMany({
             include: {
                 employee: true,
             }
@@ -27,7 +27,7 @@ export class AttendanceService {
     async getAttendanceById(
         attendanceWhereUniqueInput: Prisma.AttendanceWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const attendance = await this.prisma.attendance.findUnique({
+        const attendance = await this.prisma.client.attendance.findUnique({
             where: attendanceWhereUniqueInput,
             include: {
                 employee: true,
