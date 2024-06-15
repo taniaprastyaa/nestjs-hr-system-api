@@ -10,7 +10,7 @@ export class DepartmentService {
 
     // Get all departments
     async getAllDepartment() : Promise<ResponseFormatter> {
-        const departments = await this.prisma.department.findMany();
+        const departments = await this.prisma.client.department.findMany();
 
         return ResponseFormatter.success(
             "Department fetched successfully",
@@ -22,7 +22,7 @@ export class DepartmentService {
     async getDepartmentById(
         departmentWhereUniqueInput: Prisma.DepartmentWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const department = await this.prisma.department.findUnique({
+        const department = await this.prisma.client.department.findUnique({
             where: departmentWhereUniqueInput,
         });
 
@@ -83,8 +83,8 @@ export class DepartmentService {
     // Delete department in database
     async deleteDepartment(where: Prisma.DepartmentWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const department = await this.prisma.department.delete({
-                where,
+            const department = await this.prisma.client.department.delete({
+               id: where.id,
             });
 
             return ResponseFormatter.success(
