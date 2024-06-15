@@ -340,6 +340,10 @@ model EmployeesOnAssignment {
   task EmployeeTask @relation(fields: [employee_task_id], references: [id])
   employee_task_id Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
   @@map("employees_on_assignment")
 }
 
