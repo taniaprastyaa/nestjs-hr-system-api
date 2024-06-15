@@ -12,7 +12,7 @@ export class HodAttendanceService {
 
     // Get all attendances
     async getAllAttendance(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findMany({
+        const employee = await this.prisma.client.employee.findMany({
             where: {
                 user_id 
             },
@@ -23,7 +23,7 @@ export class HodAttendanceService {
 
         const department = employee[0]["department"]["department_name"];
 
-        const attendances = await this.prisma.attendance.findMany({
+        const attendances = await this.prisma.client.attendance.findMany({
             where: {
                 employee: {
                   department: {
@@ -46,7 +46,7 @@ export class HodAttendanceService {
     async getAttendanceById(
         attendanceWhereUniqueInput: Prisma.AttendanceWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const attendance = await this.prisma.attendance.findUnique({
+        const attendance = await this.prisma.client.attendance.findUnique({
             where: attendanceWhereUniqueInput,
             include: {
               employee: true
@@ -65,7 +65,7 @@ export class HodAttendanceService {
       yesterdayDate.setDate(yesterdayDate.getDate() - 1);
       const yesterdayISOString = yesterdayDate.toISOString().split('T')[0];
 
-      const employee = await this.prisma.employee.findMany({
+      const employee = await this.prisma.client.employee.findMany({
         where: {
             user_id 
         },
@@ -76,7 +76,7 @@ export class HodAttendanceService {
 
     const department = employee[0]["department"]["department_name"];
   
-    const employees = await this.prisma.employee.findMany({
+    const employees = await this.prisma.client.employee.findMany({
       where: {
         department: {
           department_name: department
@@ -85,7 +85,7 @@ export class HodAttendanceService {
     });
   
       for (const employee of employees) {
-        const existingAttendance = await this.prisma.attendance.findFirst({
+        const existingAttendance = await this.prisma.client.attendance.findFirst({
           where: {
             date: yesterdayISOString,
             employee_id: employee.id,
@@ -115,7 +115,7 @@ export class HodAttendanceService {
   }) : Promise<ResponseFormatter> {
       try {
           const {where, dto} = params;
-          const workShift = await this.prisma.employeeWorkShift.findFirst({
+          const workShift = await this.prisma.client.employeeWorkShift.findFirst({
             where: {
                 employee_id: dto.employee_id
             },
@@ -154,11 +154,8 @@ export class HodAttendanceService {
   // Delete attendance in database
   async deleteAttendance(where: Prisma.AttendanceWhereUniqueInput) : Promise<ResponseFormatter> {
       try {
-          const attendance = await this.prisma.attendance.delete({
-              where,
-              include: {
-                employee: true
-              }
+          const attendance = await this.prisma.client.attendance.delete({
+              id: where.id
           });
 
           return ResponseFormatter.success(
