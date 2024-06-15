@@ -10,7 +10,7 @@ export class LeaveRequestHodService {
 
     // Get all leaveRequests
     async getAllLeaveRequest(department: string) : Promise<ResponseFormatter> {
-        const leaveRequests = await this.prisma.leaveRequest.findMany({
+        const leaveRequests = await this.prisma.client.leaveRequest.findMany({
             where: {
               employee: {
                 department: {
@@ -34,7 +34,7 @@ export class LeaveRequestHodService {
     async getEmployeeByUserId(
         user_id: number
     ) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findMany({
+        const employee = await this.prisma.client.employee.findMany({
             where: {
                 user_id
             },
@@ -50,7 +50,7 @@ export class LeaveRequestHodService {
     async getLeaveRequestById(
         leaveRequestWhereUniqueInput: Prisma.LeaveRequestWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const leaveRequest = await this.prisma.leaveRequest.findUnique({
+        const leaveRequest = await this.prisma.client.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
             include: {
                 employee: true,
@@ -78,13 +78,13 @@ export class LeaveRequestHodService {
             });
 
             if(leaveRequest && (leaveRequest.status === "Approved")){
-                const leaveAllowance =  await this.prisma.leaveAllowance.findUnique({
+                const leaveAllowance =  await this.prisma.client.leaveAllowance.findUnique({
                     where: {
                         employee_id: leaveRequest.employee_id
                     }
                 });
 
-                const leave = await this.prisma.leave.findUnique({
+                const leave = await this.prisma.client.leave.findUnique({
                     where: {
                         id: leaveRequest.leave_id
                     },
@@ -112,7 +112,7 @@ export class LeaveRequestHodService {
                     currentDate.setDate(currentDate.getDate() + i);
 
                     // Periksa apakah karyawan sudah memiliki catatan kehadiran untuk tanggal tersebut
-                    const existingAttendance = await this.prisma.attendance.findFirst({
+                    const existingAttendance = await this.prisma.client.attendance.findFirst({
                         where: {
                         date: currentDate.toISOString().split('T')[0],
                         employee_id: leaveRequest.employee_id,
