@@ -10,14 +10,6 @@ import { GetCurrentUser, GetCurrentUserId, Public } from "src/common/decorators"
 @Controller('auth')
 export class AuthController{
     constructor(private authService: AuthService) {}
-
-    @Public()
-    @Post('signup')
-    @HttpCode(HttpStatus.CREATED)
-    signup(@Body() dto: SignupDto): Promise<Tokens> {
-        return this.authService.signup(dto);
-    }
-
     @Public()
     @Post('signin')
     @HttpCode(HttpStatus.OK)

@@ -14,32 +14,6 @@ export class AuthService {
         private jwtService: JwtService,
         private config: ConfigService) {}
     
-    async signup(dto: SignupDto): Promise<Tokens> {
-        const hash = await argon.hash(dto.password);
-
-        const newUser = await this.prisma.user.create({
-            data: {
-                username: dto.username,
-                email: dto.email,
-                password: hash,
-                role: "Admin"
-            }
-        })
-        .catch((error) => {
-            if (error instanceof PrismaClientKnownRequestError) {
-              if (error.code === 'P2002') {
-                throw new ForbiddenException('Credentials incorrect');
-              }
-            }
-            throw error;
-        });
-
-        const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-        await this.updateRtHash(newUser.id, tokens.refresh_token);
-
-        return tokens;
-    }
-
     async signin(dto: SigninDto): Promise<Tokens>{
         const user = await this.prisma.user.findUnique({
             where: {
