@@ -85,6 +85,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("users")
 }
@@ -99,6 +100,7 @@ model Admin {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("admins")
 }
@@ -133,6 +135,7 @@ model Employee {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("employees")
 }
@@ -144,6 +147,7 @@ model Department {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   employees Employee[]
   department_documents DepartmentDocument[]
@@ -161,6 +165,7 @@ model JobPosition {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   employees Employee[]
 
@@ -178,6 +183,7 @@ model DepartmentDocument {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("department_documents")
 }
@@ -194,6 +200,7 @@ model Announcement {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("announcements")
 }
@@ -208,6 +215,7 @@ model Leave {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("leaves")
 }
@@ -230,6 +238,7 @@ model LeaveRequest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("leave_requests")
 }
@@ -244,6 +253,7 @@ model LeaveAllowance {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("leave_allowances")
 }
@@ -261,6 +271,7 @@ model Attendance {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("attendances")
 }
@@ -275,6 +286,7 @@ model WorkShift {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("work_shifts")
 }
@@ -290,6 +302,7 @@ model EmployeeWorkShift {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("employee_work_shifts")
 }
@@ -313,6 +326,7 @@ model EmployeeTask {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   assignedEmployees EmployeesOnAssignment[]
 
@@ -342,6 +356,7 @@ model Overtime {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("overtimes")
 }
@@ -360,6 +375,7 @@ model SalarySlip {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("salary_slips")
 }
