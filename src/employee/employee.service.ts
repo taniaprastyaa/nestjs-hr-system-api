@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
-import * as argon from 'argon2'
+import * as argon from 'argon2';
+const logger = new Logger('EmployeeTaskService');
 
 @Injectable()
 export class EmployeeService {
@@ -11,7 +12,7 @@ export class EmployeeService {
 
     // Get all employees 
     async getAllEmployees() : Promise<ResponseFormatter> {
-        const employees = await this.prisma.employee.findMany({
+        const employees = await this.prisma.client.employee.findMany({
             include: {
               user: true,
               department: true,
@@ -26,7 +27,7 @@ export class EmployeeService {
     }
 
     async getAllEmployeesPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
@@ -52,7 +53,7 @@ export class EmployeeService {
     async getEmployeeById(
         employeeWhereUniqueInput: Prisma.EmployeeWhereUniqueInput,
     ): Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findUnique({
+        const employee = await this.prisma.client.employee.findUnique({
             where: employeeWhereUniqueInput,
             include: {
                 user: true,
@@ -198,23 +199,55 @@ export class EmployeeService {
                 }
             });
 
-            const employee = await this.prisma.employee.delete({
-                where,
+            const leaveRequested = await this.prisma.client.leaveRequest.deleteMany({
+                id: where.id
+            });
+    
+            const leaveAllowance = await this.prisma.client.leaveAllowance.deleteMany({
+                id: where.id
+            });
+    
+            const attendance = await this.prisma.client.attendance.deleteMany({
+                id: where.id
+            });
+    
+            const employeeWorkShift = await this.prisma.client.employeeWorkShift.deleteMany({
+                id: where.id
+            });
+    
+            const salarySlip = await this.prisma.client.salarySlip.deleteMany({
+                id: where.id
+            });
+    
+            const employeeOnAssignment = await this.prisma.client.employeesOnAssignment.deleteMany({
+                id: where.id
+            });
+    
+            const overtime = await this.prisma.client.overtime.deleteMany({
+                id: where.id
+            });
+    
+            const employeeTask = await this.prisma.client.employeeTask.deleteMany({
+                id: where.id
             });
 
-            const user = await this.prisma.user.delete({
-                where : {
-                    id : existingEmployee.user_id
-                },
+            const employee = await this.prisma.client.employee.delete({
+                id: where.id,
             });
 
-            const userEmployee = {user, employee};
+            const user = await this.prisma.client.user.delete({
+                id : existingEmployee.user_id
+            });
+
+            const userEmployee = {user, employee, leaveRequested, leaveAllowance, attendance, employeeWorkShift, salarySlip, employeeOnAssignment, overtime, employeeTask};
 
             return ResponseFormatter.success(
                 "Employee deleted successfully",
                 userEmployee
             );
         } catch (err) {
+            logger.error('Error delete employee :', err);
+
             throw new InternalServerErrorException('Employee failed to delete');
         } 
     }
