@@ -10,7 +10,7 @@ export class LeaveRequestEmployeeService {
 
     // Get all leaveRequestEmployees
     async getAllLeaveRequestEmployee(employee_id: number) : Promise<ResponseFormatter> {
-        const leaveRequestEmployees = await this.prisma.leaveRequest.findMany({
+        const leaveRequestEmployees = await this.prisma.client.leaveRequest.findMany({
             where:{
                 employee_id
             },
@@ -30,7 +30,7 @@ export class LeaveRequestEmployeeService {
     async getEmployeeByUserId(
         user_id: number
     ) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findMany({
+        const employee = await this.prisma.client.employee.findMany({
             where: {
                 user_id
             }
@@ -43,7 +43,7 @@ export class LeaveRequestEmployeeService {
     async getLeaveRequestEmployeeById(
         leaveRequestWhereUniqueInput: Prisma.LeaveRequestWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const leaveRequestEmployee = await this.prisma.leaveRequest.findUnique({
+        const leaveRequestEmployee = await this.prisma.client.leaveRequest.findUnique({
             where: leaveRequestWhereUniqueInput,
             include: {
                 employee: true,
@@ -139,11 +139,8 @@ export class LeaveRequestEmployeeService {
                 throw new BadRequestException("Leave request has already been processed and cannot be edited.");
             }
 
-            const leaveRequestEmployee = await this.prisma.leaveRequest.delete({
-                where,
-                include: {
-                    employee: true
-                }
+            const leaveRequestEmployee = await this.prisma.client.leaveRequest.delete({
+                id: where.id
             });
 
             return ResponseFormatter.success(
