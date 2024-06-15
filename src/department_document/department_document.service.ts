@@ -12,7 +12,7 @@ export class DepartmentDocumentService {
 
     // Get all department documents
     async getAllDepartmentDocuments() : Promise<ResponseFormatter> {
-        const departmentDocuments = await this.prisma.departmentDocument.findMany({
+        const departmentDocuments = await this.prisma.client.departmentDocument.findMany({
             include: {
                 department: true
             }
@@ -25,12 +25,12 @@ export class DepartmentDocumentService {
     }
 
     async getDepartmentDocumentsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
         })
-        const departmentDocuments = await this.prisma.departmentDocument.findMany({
+        const departmentDocuments = await this.prisma.client.departmentDocument.findMany({
             where: {
                 department_id: employee.department_id
             }
@@ -46,7 +46,7 @@ export class DepartmentDocumentService {
     async getDepartmentDocumentById(
         departmentDocumentWhereUniqueInput: Prisma.DepartmentDocumentWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const departmentDocument = await this.prisma.departmentDocument.findUnique({
+        const departmentDocument = await this.prisma.client.departmentDocument.findUnique({
             where: departmentDocumentWhereUniqueInput,
         });
 
@@ -59,7 +59,7 @@ export class DepartmentDocumentService {
     // Store department document to database
     async createDepartmentDocument(dto: CreateDepartmentDocumentDto, user_id: number) : Promise<ResponseFormatter> {
         try {
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
@@ -96,7 +96,7 @@ export class DepartmentDocumentService {
     }) : Promise<ResponseFormatter> {
         try {
             const {where, dto, user_id} = params;
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
@@ -125,11 +125,8 @@ export class DepartmentDocumentService {
     // Delete department document in database
     async deleteDepartmentDocument(where: Prisma.DepartmentDocumentWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const departmentDocument = await this.prisma.departmentDocument.delete({
-                where,
-                include: {
-                    department: true
-                },
+            const departmentDocument = await this.prisma.client.departmentDocument.delete({
+                id: where.id
             });
 
             const documentFilePath = path.join(__dirname, '../../assets/department_document', departmentDocument.document_file);
