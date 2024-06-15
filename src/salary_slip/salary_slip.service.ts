@@ -11,7 +11,7 @@ export class SalarySlipService {
 
     // Get all salarySlips
     async getAllSalarySlips() : Promise<ResponseFormatter> {
-        const salarySlips = await this.prisma.salarySlip.findMany({
+        const salarySlips = await this.prisma.client.salarySlip.findMany({
           include: {
             employee: true
           }
@@ -24,7 +24,7 @@ export class SalarySlipService {
     }
 
     async getAllSalarySlipsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const hod = await this.prisma.employee.findFirst({
+        const hod = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             },
@@ -33,7 +33,7 @@ export class SalarySlipService {
             }
         });
 
-        const salarySlips = await this.prisma.salarySlip.findMany({
+        const salarySlips = await this.prisma.client.salarySlip.findMany({
             where: {
                 employee: {
                     department: {
@@ -53,13 +53,13 @@ export class SalarySlipService {
     }
 
     async getAllSalarySlipsByEmployeeId(user_id: number) : Promise<ResponseFormatter> {
-      const employee = await this.prisma.employee.findFirst({
+      const employee = await this.prisma.client.employee.findFirst({
           where: {
               user_id
           },
       });
 
-      const salarySlips = await this.prisma.salarySlip.findMany({
+      const salarySlips = await this.prisma.client.salarySlip.findMany({
           where: {
               employee_id: employee.id
           },
@@ -78,7 +78,7 @@ export class SalarySlipService {
     async getSalarySlipById(
         salarySlipWhereUniqueInput: Prisma.SalarySlipWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const salarySlip = await this.prisma.salarySlip.findUnique({
+        const salarySlip = await this.prisma.client.salarySlip.findUnique({
             where: salarySlipWhereUniqueInput,
             include: {
               employee: true,
@@ -94,7 +94,7 @@ export class SalarySlipService {
     // Store salarySlip to database
     async generateSalarySlips(user_id: number): Promise<ResponseFormatter> {
         try {
-            const hod = await this.prisma.employee.findFirst({
+            const hod = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 },
@@ -107,7 +107,7 @@ export class SalarySlipService {
             const month = currentDate.getMonth() + 1; // getMonth() returns 0-11, so we add 1
             const year = currentDate.getFullYear();
         
-            const employees = await this.prisma.employee.findMany({
+            const employees = await this.prisma.client.employee.findMany({
                 where: {
                     department: {
                         department_name: hod["department"].department_name
@@ -116,7 +116,7 @@ export class SalarySlipService {
             });
     
             for (const employee of employees) {
-                const existingSlip = await this.prisma.salarySlip.findFirst({
+                const existingSlip = await this.prisma.client.salarySlip.findFirst({
                     where: {
                         employee_id: employee.id,
                         month,
@@ -157,7 +157,7 @@ export class SalarySlipService {
     }
     
     async getBasicSalary(positionId: number): Promise<number> {
-        const position = await this.prisma.jobPosition.findUnique({
+        const position = await this.prisma.client.jobPosition.findUnique({
           where: { id: positionId },
         });
         return position?.basic_salary || 0;
@@ -165,7 +165,7 @@ export class SalarySlipService {
     
     async calculateOvertimePay(employeeId: number, month: number, year: number): Promise<number> {
         const overtimeRate = 10000; // Overtime rate per hour
-        const overtimes = await this.prisma.overtime.findMany({
+        const overtimes = await this.prisma.client.overtime.findMany({
           where: {
             employee_id: employeeId,
             date: {
@@ -184,7 +184,7 @@ export class SalarySlipService {
     
     async calculateTotalCuts(employeeId: number, month: number, year: number, basicSalary: number): Promise<number> {
         try {
-          const unpaidLeaves = await this.prisma.leaveRequest.findMany({
+          const unpaidLeaves = await this.prisma.client.leaveRequest.findMany({
             where: {
               employee_id: employeeId,
               status: 'Approved',
@@ -205,7 +205,7 @@ export class SalarySlipService {
             totalUnpaidLeaveValue += leave.long_leave * leave["leave"].value;
           }
     
-          const absences = await this.prisma.attendance.findMany({
+          const absences = await this.prisma.client.attendance.findMany({
             where: {
               employee_id: employeeId,
               status: 'Absent',
@@ -219,7 +219,7 @@ export class SalarySlipService {
           const cutPerDay = basicSalary / 22;
           const absenceCuts = (totalUnpaidLeaveValue + totalAbsences) * cutPerDay;
     
-          const attendances = await this.prisma.attendance.findMany({
+          const attendances = await this.prisma.client.attendance.findMany({
             where: {
               employee_id: employeeId,
               status: 'Present',
@@ -250,8 +250,8 @@ export class SalarySlipService {
     // Delete salarySlip in database
     async deleteSalarySlip(where: Prisma.SalarySlipWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const salarySlip = await this.prisma.salarySlip.delete({
-                where,
+            const salarySlip = await this.prisma.client.salarySlip.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
