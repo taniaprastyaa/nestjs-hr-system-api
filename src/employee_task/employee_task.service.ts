@@ -13,7 +13,7 @@ export class EmployeeTaskService {
     // Get all employee tasks
     async getAllEmployeeTasks(): Promise<ResponseFormatter> {
         try {
-          const employeeTasks = await this.prisma.employeeTask.findMany({
+          const employeeTasks = await this.prisma.client.employeeTask.findMany({
             include: {
               department: true,
               employee: true
@@ -23,7 +23,7 @@ export class EmployeeTaskService {
           const employeeTaskInfo = [];
       
           for (const task of employeeTasks) {
-            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+            const employeesOnAssignment = await this.prisma.client.employeesOnAssignment.findMany({
               where: {
                 employee_task_id: task.id,
               },
@@ -49,13 +49,13 @@ export class EmployeeTaskService {
      
     async getEmployeeTasksPerDepartment(user_id: number): Promise<ResponseFormatter> {
         try {
-          const employee = await this.prisma.employee.findFirst({
+          const employee = await this.prisma.client.employee.findFirst({
               where: {
                   user_id
               }
           });
 
-          const employeeTasks = await this.prisma.employeeTask.findMany({
+          const employeeTasks = await this.prisma.client.employeeTask.findMany({
             where: {
                 department_id: employee.department_id
             },
@@ -68,7 +68,7 @@ export class EmployeeTaskService {
           const employeeTaskInfo = [];
       
           for (const task of employeeTasks) {
-            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+            const employeesOnAssignment = await this.prisma.client.employeesOnAssignment.findMany({
               where: {
                 employee_task_id: task.id,
               },
@@ -94,13 +94,13 @@ export class EmployeeTaskService {
 
     async getEmployeeTasks(user_id: number): Promise<ResponseFormatter> {
         try {
-          const employee = await this.prisma.employee.findFirst({
+          const employee = await this.prisma.client.employee.findFirst({
               where: {
                   user_id
               }
           });
 
-          const employeeTasks = await this.prisma.employeeTask.findMany({
+          const employeeTasks = await this.prisma.client.employeeTask.findMany({
             where: {
                 assignedEmployees: {
                     some: {
@@ -120,7 +120,7 @@ export class EmployeeTaskService {
           const employeeTaskInfo = [];
       
           for (const task of employeeTasks) {
-            const employeesOnAssignment = await this.prisma.employeesOnAssignment.findMany({
+            const employeesOnAssignment = await this.prisma.client.employeesOnAssignment.findMany({
               where: {
                 employee_task_id: task.id,
               },
@@ -148,14 +148,14 @@ export class EmployeeTaskService {
     async getEmployeeTaskById(
         employeeTaskWhereUniqueInput: Prisma.EmployeeTaskWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const employeeTask = await this.prisma.employeeTask.findUnique({
+        const employeeTask = await this.prisma.client.employeeTask.findUnique({
             where: employeeTaskWhereUniqueInput,
             include: {
                 department: true,
             }
         });
 
-        const employeesOnAssignments = await this.prisma.employeesOnAssignment.findMany({
+        const employeesOnAssignments = await this.prisma.client.employeesOnAssignment.findMany({
             where: {
                 employee_task_id: employeeTaskWhereUniqueInput.id
             },
@@ -168,7 +168,7 @@ export class EmployeeTaskService {
             }
         });
 
-        const employeesOnAssignmentDetails = await this.prisma.employeesOnAssignment.findMany({
+        const employeesOnAssignmentDetails = await this.prisma.client.employeesOnAssignment.findMany({
             where: {
                 employee_task_id: employeeTaskWhereUniqueInput.id
             },
@@ -190,7 +190,7 @@ export class EmployeeTaskService {
     // Store employee task to database
     async createEmployeeTask(user_id: number, dto: EmployeeTaskDto) {
         try {
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
@@ -211,7 +211,7 @@ export class EmployeeTaskService {
             });
     
             for (const employee_id of dto.employee_on_assignment_ids) {
-                const employeeExists = await this.prisma.employee.findUnique({
+                const employeeExists = await this.prisma.client.employee.findUnique({
                     where: {
                         id: employee_id
                     }
@@ -255,13 +255,13 @@ export class EmployeeTaskService {
         try {
             const { where, dto, user_id } = params;
 
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
             })
     
-            const existingTask = await this.prisma.employeeTask.findUnique({
+            const existingTask = await this.prisma.client.employeeTask.findUnique({
                 where,
                 include: {
                     assignedEmployees: true,
@@ -273,10 +273,8 @@ export class EmployeeTaskService {
             }
     
             // Delete existing assigned employees
-            await this.prisma.employeesOnAssignment.deleteMany({
-                where: {
-                    employee_task_id: existingTask.id,
-                }
+            await this.prisma.client.employeesOnAssignment.deleteMany({
+                employee_task_id: existingTask.id
             });
     
             // Update the employee task
@@ -298,7 +296,7 @@ export class EmployeeTaskService {
     
             // Add new assigned employees
             for (const employee_id of dto.employee_on_assignment_ids) {
-                const employeeExists = await this.prisma.employee.findUnique({
+                const employeeExists = await this.prisma.client.employee.findUnique({
                     where: {
                         id: employee_id
                     }
@@ -334,19 +332,17 @@ export class EmployeeTaskService {
     // Delete employee task in database
     async deleteEmployeeTask(where: Prisma.EmployeeTaskWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const employeeTask = await this.prisma.employeeTask.findUnique({
+            const employeeTask = await this.prisma.client.employeeTask.findUnique({
                 where
             });
 
-            const employeesOnAssignment = await this.prisma.employeesOnAssignment.deleteMany({
-                where: {
-                    employee_task_id: where.id
-                }
+            const employeesOnAssignment = await this.prisma.client.employeesOnAssignment.deleteMany({
+                employee_task_id: where.id
             });
 
             if(employeesOnAssignment) {
-                const employeeTask = await this.prisma.employeeTask.delete({
-                    where,
+                const employeeTask = await this.prisma.client.employeeTask.delete({
+                    id: where.id,
                 });
             }
 
@@ -358,25 +354,6 @@ export class EmployeeTaskService {
             logger.error('Error updating employee task:', err);
 
             throw new InternalServerErrorException('Employee Task failed to delete');
-        }
-    }
-
-    // Store employee on assigment
-    async addEmployeesOnAssignment(
-        employee_id: number,
-        employee_task_id: number,
-    ): Promise<void> {
-        try {
-        await this.prisma.employeesOnAssignment.create({
-            data: {
-                employee_id,
-                employee_task_id
-            },
-        });
-
-        } catch (error) {
-        // Handle error here if necessary
-        throw new InternalServerErrorException('Failed to add employee on assignment');
         }
     }
 }
