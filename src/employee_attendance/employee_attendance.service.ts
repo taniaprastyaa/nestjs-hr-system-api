@@ -12,13 +12,13 @@ export class EmployeeAttendanceService {
 
     // Get all attendances
     async getAllAttendance(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findMany({
+        const employee = await this.prisma.client.employee.findMany({
             where: {
                 user_id 
             }
         });
 
-        const attendances = await this.prisma.attendance.findMany({
+        const attendances = await this.prisma.client.attendance.findMany({
             where: {
                 employee_id: employee[0].id
             },
@@ -37,7 +37,7 @@ export class EmployeeAttendanceService {
     async getAttendanceById(
         attendanceWhereUniqueInput: Prisma.AttendanceWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const attendance = await this.prisma.attendance.findUnique({
+        const attendance = await this.prisma.client.attendance.findUnique({
             where: attendanceWhereUniqueInput,
             include: {
                 employee: true
@@ -55,13 +55,13 @@ export class EmployeeAttendanceService {
             const date = new Date().toISOString().split('T')[0];
             const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
-            const employee = await this.prisma.employee.findMany({
+            const employee = await this.prisma.client.employee.findMany({
                 where: {
                     user_id
                 },
             });
 
-            const existingAttendance = await this.prisma.attendance.findFirst({
+            const existingAttendance = await this.prisma.client.attendance.findFirst({
                 where: {
                   date,
                   employee_id: employee[0].id,
@@ -72,7 +72,7 @@ export class EmployeeAttendanceService {
                 throw new BadRequestException("You've already filled in your attendance for today");
             }
             
-            const workShift = await this.prisma.employeeWorkShift.findFirst({
+            const workShift = await this.prisma.client.employeeWorkShift.findFirst({
                 where: {
                     employee_id: employee[0].id
                 },
