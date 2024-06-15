@@ -10,7 +10,7 @@ export class JobPositionService {
 
     // Get all job positions
     async getAllJobPosition() : Promise<ResponseFormatter> {
-        const jobPositions = await this.prisma.jobPosition.findMany();
+        const jobPositions = await this.prisma.client.jobPosition.findMany();
 
         return ResponseFormatter.success(
             "JobPosition fetched successfully",
@@ -22,7 +22,7 @@ export class JobPositionService {
     async getJobPositionById(
         jobPositionWhereUniqueInput: Prisma.JobPositionWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const jobPosition = await this.prisma.jobPosition.findUnique({
+        const jobPosition = await this.prisma.client.jobPosition.findUnique({
             where: jobPositionWhereUniqueInput,
         });
 
@@ -83,8 +83,8 @@ export class JobPositionService {
     // Delete job position in database
     async deleteJobPosition(where: Prisma.JobPositionWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const jobPosition = await this.prisma.jobPosition.delete({
-                where,
+            const jobPosition = await this.prisma.client.jobPosition.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
