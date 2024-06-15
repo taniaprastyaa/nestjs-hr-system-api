@@ -11,7 +11,7 @@ export class AdminService {
 
     // Get all admins 
     async getAllAdmins() : Promise<ResponseFormatter> {
-        const admins = await this.prisma.admin.findMany({
+        const admins = await this.prisma.client.admin.findMany({
             include: {
               user: true,
             },
@@ -27,7 +27,7 @@ export class AdminService {
     async getAdminById(
         adminWhereUniqueInput: Prisma.AdminWhereUniqueInput,
     ): Promise<ResponseFormatter> {
-        const admin = await this.prisma.admin.findUnique({
+        const admin = await this.prisma.client.admin.findUnique({
             where: adminWhereUniqueInput,
             include: {
                 user: true,
@@ -86,7 +86,7 @@ export class AdminService {
     }) {
         try {
             const {dto, where} = params;
-            const existingAdmin = await this.prisma.admin.findUnique({
+            const existingAdmin = await this.prisma.client.admin.findUnique({
                 where,
                 include : {
                     user: true
@@ -130,21 +130,19 @@ export class AdminService {
     // Delete admin in database
     async deleteAdmin(where: Prisma.AdminWhereUniqueInput): Promise<ResponseFormatter> {
         try {
-            const existingAdmin = await this.prisma.admin.findUnique({
+            const existingAdmin = await this.prisma.client.admin.findUnique({
                 where,
                 include : {
                     user: true
                 }
             });
 
-            const admin = await this.prisma.admin.delete({
-                where,
+            const admin = await this.prisma.client.admin.delete({
+                id: where.id,
             });
 
-            const user = await this.prisma.user.delete({
-                where : {
-                    id : existingAdmin.user_id
-                },
+            const user = await this.prisma.client.user.delete({
+                id : existingAdmin.user_id
             });
 
             const userAdmin = {user, admin};
