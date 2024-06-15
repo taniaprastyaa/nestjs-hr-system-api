@@ -10,7 +10,7 @@ export class HodOvertimeService {
 
     // Get all employee overtimes
     async getAllEmployeeOvertimes(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             },
@@ -19,7 +19,7 @@ export class HodOvertimeService {
             }
         });
 
-        const hodOvertimes = await this.prisma.overtime.findMany({
+        const hodOvertimes = await this.prisma.client.overtime.findMany({
             where: {
                 employee: {
                     department: {
@@ -42,7 +42,7 @@ export class HodOvertimeService {
     async getHodOvertimeById(
         overtimeWhereUniqueInput: Prisma.OvertimeWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const hodOvertime = await this.prisma.overtime.findUnique({
+        const hodOvertime = await this.prisma.client.overtime.findUnique({
             where: overtimeWhereUniqueInput,
             include: {
                 employee: true
