@@ -11,7 +11,7 @@ export class LeaveAllowanceService {
 
     // Get all leave allowances
     async getAllLeaveAllowances() : Promise<ResponseFormatter> {
-        const leaveAllowances = await this.prisma.leaveAllowance.findMany({
+        const leaveAllowances = await this.prisma.client.leaveAllowance.findMany({
             include: {
                 employee: true
             },
@@ -24,13 +24,13 @@ export class LeaveAllowanceService {
     }
 
     async getLeaveAllowancesPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
         });
 
-        const leaveAllowances = await this.prisma.leaveAllowance.findMany({
+        const leaveAllowances = await this.prisma.client.leaveAllowance.findMany({
             where: {
                 employee: {
                     department_id: employee.department_id
@@ -48,13 +48,13 @@ export class LeaveAllowanceService {
     }
 
     async getLeaveAllowancesPerEmployee(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
         });
         
-        const leaveAllowances = await this.prisma.leaveAllowance.findMany({
+        const leaveAllowances = await this.prisma.client.leaveAllowance.findMany({
             where: {
                 employee_id: employee.id
             },
@@ -73,7 +73,7 @@ export class LeaveAllowanceService {
     async getLeaveAllowanceById(
         leaveAllowanceWhereUniqueInput: Prisma.LeaveAllowanceWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const leaveAllowance = await this.prisma.leaveAllowance.findUnique({
+        const leaveAllowance = await this.prisma.client.leaveAllowance.findUnique({
             where: leaveAllowanceWhereUniqueInput,
             include: {
                 employee: true
@@ -90,7 +90,7 @@ export class LeaveAllowanceService {
     @Cron('0 0 1 * *') // Run at midnight on the first day of each month
     async createLeaveAllowanceAutomatically(): Promise<void> {
       // Get all employees
-      const employees = await this.prisma.employee.findMany();
+      const employees = await this.prisma.client.employee.findMany();
   
       // Get the current year
       const currentYear = new Date().getFullYear().toString();
@@ -98,7 +98,7 @@ export class LeaveAllowanceService {
       // Iterate through each employee
       for (const employee of employees) {
         // Check if leave allowance entry exists for the current year
-        const existingLeaveAllowance = await this.prisma.leaveAllowance.findFirst({
+        const existingLeaveAllowance = await this.prisma.client.leaveAllowance.findFirst({
           where: {
             employee_id: employee.id,
             year: currentYear,
@@ -151,11 +151,8 @@ export class LeaveAllowanceService {
     // Delete leaveAllowance in database
     async deleteLeaveAllowance(where: Prisma.LeaveAllowanceWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const leaveAllowance = await this.prisma.leaveAllowance.delete({
-                where,
-                include: {
-                    employee: true
-                },
+            const leaveAllowance = await this.prisma.client.leaveAllowance.delete({
+                id: where.id
             });
 
             return ResponseFormatter.success(
