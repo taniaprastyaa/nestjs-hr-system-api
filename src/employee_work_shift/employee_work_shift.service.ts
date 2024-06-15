@@ -10,7 +10,7 @@ export class EmployeeWorkShiftService {
 
     // Get all employee work shifts
     async getAllEmployeeWorkShifts() : Promise<ResponseFormatter> {
-        const employeeWorkShifts = await this.prisma.employeeWorkShift.findMany(
+        const employeeWorkShifts = await this.prisma.client.employeeWorkShift.findMany(
             {
                 include: {
                   employee: true,
@@ -26,13 +26,13 @@ export class EmployeeWorkShiftService {
     }
 
     async getEmployeeWorkShiftsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
         });
         
-        const employeeWorkShifts = await this.prisma.employeeWorkShift.findMany(
+        const employeeWorkShifts = await this.prisma.client.employeeWorkShift.findMany(
             {
                 where: {
                     employee: {
@@ -53,13 +53,13 @@ export class EmployeeWorkShiftService {
     }
 
     async getEmployeeWorkShift(user_id: number) : Promise<ResponseFormatter> {
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
         });
         
-        const employeeWorkShifts = await this.prisma.employeeWorkShift.findFirst(
+        const employeeWorkShifts = await this.prisma.client.employeeWorkShift.findFirst(
             {
                 where: {
                     employee_id: employee.id
@@ -82,7 +82,7 @@ export class EmployeeWorkShiftService {
     async getEmployeeWorkShiftById(
         employeeWorkShiftWhereUniqueInput: Prisma.EmployeeWorkShiftWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const employeeWorkShift = await this.prisma.employeeWorkShift.findUnique({
+        const employeeWorkShift = await this.prisma.client.employeeWorkShift.findUnique({
             where: employeeWorkShiftWhereUniqueInput,
             include: {
                 employee: true,
@@ -99,7 +99,7 @@ export class EmployeeWorkShiftService {
     // Store employee work shift to database
     async createEmployeeWorkShift(dto: EmployeeWorkShiftDto) : Promise<ResponseFormatter> {
         try {
-            const employeeWorkShift = await this.prisma.employeeWorkShift.create({
+            const employeeWorkShift = await this.prisma.client.employeeWorkShift.create({
                 data: {
                     ...dto,
                 }
@@ -147,8 +147,8 @@ export class EmployeeWorkShiftService {
     // Delete employee work shift in database
     async deleteEmployeeWorkShift(where: Prisma.EmployeeWorkShiftWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const employeeWorkShift = await this.prisma.employeeWorkShift.delete({
-                where,
+            const employeeWorkShift = await this.prisma.client.employeeWorkShift.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
