@@ -10,7 +10,7 @@ export class EmployeeOvertimeService {
 
     // Get all Employeeovertimes
     async getAllEmployeeOvertime() : Promise<ResponseFormatter> {
-        const employeeOvertimes = await this.prisma.overtime.findMany({
+        const employeeOvertimes = await this.prisma.client.overtime.findMany({
             include: {
                 employee: true
             }
@@ -26,7 +26,7 @@ export class EmployeeOvertimeService {
     async getEmployeeOvertimeById(
         EmployeeovertimeWhereUniqueInput: Prisma.OvertimeWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const employeeOvertime = await this.prisma.overtime.findUnique({
+        const employeeOvertime = await this.prisma.client.overtime.findUnique({
             where: EmployeeovertimeWhereUniqueInput,
             include: {
                 employee: true
@@ -42,7 +42,7 @@ export class EmployeeOvertimeService {
     // Store employee overtime to database
     async createEmployeeOvertime(dto: EmployeeOvertimeDto, user_id: number) : Promise<ResponseFormatter> {
         const duration = this.calculateDuration(dto.start_time, dto.end_time);
-        const employee = await this.prisma.employee.findFirst({
+        const employee = await this.prisma.client.employee.findFirst({
             where: {
                 user_id
             }
@@ -124,8 +124,8 @@ export class EmployeeOvertimeService {
                 throw new BadRequestException("Employee overtime has already been processed and cannot be deleted.")
             }
 
-            const employeeOvertime = await this.prisma.overtime.delete({
-                where,
+            const employeeOvertime = await this.prisma.client.overtime.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
