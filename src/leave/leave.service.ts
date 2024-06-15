@@ -10,7 +10,7 @@ export class LeaveService {
 
     // Get all leaves
     async getAllLeave() : Promise<ResponseFormatter> {
-        const leaves = await this.prisma.leave.findMany();
+        const leaves = await this.prisma.client.leave.findMany();
 
         return ResponseFormatter.success(
             "Leave fetched successfully",
@@ -22,7 +22,7 @@ export class LeaveService {
     async getLeaveById(
         leaveWhereUniqueInput: Prisma.LeaveWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const leave = await this.prisma.leave.findUnique({
+        const leave = await this.prisma.client.leave.findUnique({
             where: leaveWhereUniqueInput,
         });
 
@@ -83,8 +83,8 @@ export class LeaveService {
     // Delete leave in database
     async deleteLeave(where: Prisma.LeaveWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const leave = await this.prisma.leave.delete({
-                where,
+            const leave = await this.prisma.client.leave.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
