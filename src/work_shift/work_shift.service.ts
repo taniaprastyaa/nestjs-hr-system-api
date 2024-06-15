@@ -10,7 +10,7 @@ export class WorkShiftService {
 
     // Get all work shifts
     async getAllWorkShift() : Promise<ResponseFormatter> {
-        const workShifts = await this.prisma.workShift.findMany();
+        const workShifts = await this.prisma.client.workShift.findMany();
 
         return ResponseFormatter.success(
             "Work shift fetched successfully",
@@ -22,7 +22,7 @@ export class WorkShiftService {
     async getWorkShiftById(
         workShiftWhereUniqueInput: Prisma.WorkShiftWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const workShift = await this.prisma.workShift.findUnique({
+        const workShift = await this.prisma.client.workShift.findUnique({
             where: workShiftWhereUniqueInput,
         });
 
@@ -35,7 +35,7 @@ export class WorkShiftService {
     // Store work shift to database
     async createWorkShift(dto: WorkShiftDto) : Promise<ResponseFormatter> {
         try {
-            const workShift = await this.prisma.workShift.create({
+            const workShift = await this.prisma.client.workShift.create({
                 data: {
                     ...dto,
                 }
@@ -62,7 +62,7 @@ export class WorkShiftService {
     }) : Promise<ResponseFormatter> {
         try {
             const {where, dto} = params;
-            const workShift = await this.prisma.workShift.update({
+            const workShift = await this.prisma.client.workShift.update({
                 where,
                 data: {...dto,}
             });
@@ -83,8 +83,8 @@ export class WorkShiftService {
     // Delete work shift in database
     async deleteWorkShift(where: Prisma.WorkShiftWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const workShift = await this.prisma.workShift.delete({
-                where,
+            const workShift = await this.prisma.client.workShift.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
