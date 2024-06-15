@@ -1,9 +1,15 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
+import { PrismaClientExtended } from './custom-prisma-client';
+import {
+  filterSoftDeleted,
+  softDelete,
+  softDeleteMany,
+} from './prisma.extension';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy{
+export class PrismaService extends PrismaClientExtended implements OnModuleInit, OnModuleDestroy{
     constructor(config : ConfigService) {
         super({
             datasources: {
@@ -15,7 +21,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
 
     async onModuleInit() {
-        await this.$connect()
+        await this.$connect();
+        this.$extends(softDelete) //adding extensions
+        .$extends(softDeleteMany)
+        .$extends(filterSoftDeleted);
     }
 
     async onModuleDestroy() {
