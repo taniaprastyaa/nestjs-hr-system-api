@@ -10,7 +10,7 @@ export class AnnouncementService {
 
     // Get all announcements
     async getAllAnnouncements() : Promise<ResponseFormatter> {
-        const announcements = await this.prisma.announcement.findMany({
+        const announcements = await this.prisma.client.announcement.findMany({
             include: {
                 department: true,
             },
@@ -23,13 +23,13 @@ export class AnnouncementService {
     }
 
     async getAllAnnouncementsPerDepartment(user_id: number) : Promise<ResponseFormatter> {
-        const generalAnnouncements = await this.prisma.announcement.findMany({
+        const generalAnnouncements = await this.prisma.client.announcement.findMany({
             where: {
                 department_id: null
             }
         });
 
-        const employee = await this.prisma.employee.findMany({
+        const employee = await this.prisma.client.employee.findMany({
             where: {
                 user_id 
             },
@@ -40,7 +40,7 @@ export class AnnouncementService {
 
         const department = employee[0]["department"]["department_name"];
 
-        const departmentAnnouncements = await this.prisma.announcement.findMany({
+        const departmentAnnouncements = await this.prisma.client.announcement.findMany({
             where: {
                 department_id: {
                     not: null,
@@ -66,7 +66,7 @@ export class AnnouncementService {
     async getAnnouncementById(
         announcementWhereUniqueInput: Prisma.AnnouncementWhereUniqueInput,
     ) : Promise<ResponseFormatter> {
-        const announcement = await this.prisma.announcement.findUnique({
+        const announcement = await this.prisma.client.announcement.findUnique({
             where: announcementWhereUniqueInput,
             include: {
                 department: true,
@@ -82,7 +82,7 @@ export class AnnouncementService {
     // Store announcement to database
     async createAnnouncement(dto: AnnouncementDto, user_id: number) : Promise<ResponseFormatter> {
         try {
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
@@ -124,7 +124,7 @@ export class AnnouncementService {
         try {
             const {where, dto, user_id} = params;
 
-            const employee = await this.prisma.employee.findFirst({
+            const employee = await this.prisma.client.employee.findFirst({
                 where: {
                     user_id
                 }
@@ -160,8 +160,8 @@ export class AnnouncementService {
     // Delete announcement in database
     async deleteAnnouncement(where: Prisma.AnnouncementWhereUniqueInput) : Promise<ResponseFormatter> {
         try {
-            const announcement = await this.prisma.announcement.delete({
-                where,
+            const announcement = await this.prisma.client.announcement.delete({
+                id: where.id,
             });
 
             return ResponseFormatter.success(
