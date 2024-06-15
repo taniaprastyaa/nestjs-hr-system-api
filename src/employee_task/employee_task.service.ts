@@ -159,12 +159,27 @@ export class EmployeeTaskService {
             where: {
                 employee_task_id: employeeTaskWhereUniqueInput.id
             },
+            select: {
+                employee: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        });
+
+        const employeesOnAssignmentDetails = await this.prisma.employeesOnAssignment.findMany({
+            where: {
+                employee_task_id: employeeTaskWhereUniqueInput.id
+            },
             include: {
                 employee: true,
             }
         });
 
-        const employeeTaskDetail = [employeeTask, employeesOnAssignments]
+        const employeeIds = employeesOnAssignments.map(assignment => assignment["employee"]["id"]);
+
+        const employeeTaskDetail = [employeeTask, employeeIds, employeesOnAssignmentDetails]
 
         return ResponseFormatter.success(
             "EmployeeTask fetched successfully",
