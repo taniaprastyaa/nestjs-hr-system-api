@@ -188,7 +188,7 @@ export class EmployeeTaskService {
     }
 
     // Store employee task to database
-    async createEmployeeTask(user_id: number, dto: EmployeeTaskDto) {
+    async createEmployeeTask(user_id: number, dto: EmployeeTaskDto): Promise<ResponseFormatter> {
         try {
             const employee = await this.prisma.client.employee.findFirst({
                 where: {
@@ -229,7 +229,10 @@ export class EmployeeTaskService {
                 }
             }
     
-            return employeeTask;
+            return ResponseFormatter.success(
+                "Employee Task updated successfully",
+                employeeTask
+            );
         } catch (err) {
             logger.error('Error creating employee task:', err);
 

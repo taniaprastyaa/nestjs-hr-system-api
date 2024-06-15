@@ -46,7 +46,7 @@ export class EmployeeTaskController{
     async createEmployeeTask(
         @GetCurrentUserId() user_id: number,
         @Body() dto: EmployeeTaskDto
-    ) {
+    ): Promise<ResponseFormatter> {
         return this.employeeTaskService.createEmployeeTask(user_id, dto);
 
     }
