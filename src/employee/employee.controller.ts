@@ -10,6 +10,14 @@ import { GetCurrentUserId } from 'src/common/decorators';
 export class EmployeeController {
     constructor(private readonly employeeService : EmployeeService) {}
 
+    @ApiBearerAuth()
+    @Get('statistics')
+    getStatistics(
+        @GetCurrentUserId() user_id: number,
+    ) {
+      return this.employeeService.getStatistics(user_id);
+    }
+
     // Get all employees
     @ApiBearerAuth()
     @Get()

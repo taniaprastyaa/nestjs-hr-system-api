@@ -258,4 +258,40 @@ export class EmployeeService {
           take: 1,
         });
     }
+
+    async getStatistics(user_id: number) {
+        const employee = await this.prisma.client.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+
+        const totalEmployees = await this.prisma.client.employee.count();
+
+        const totalHod = await this.prisma.client.employee.count({
+            where: {
+                user: {
+                    role: 'HOD'
+                }
+            }
+        });
+    
+        if(employee) {
+            const totalEmployeePerDepartment = await this.prisma.client.employee.count({
+                where:{
+                    department_id: employee.department_id
+                }
+            })
+
+            return {
+                totalEmployeePerDepartment,
+            }
+        } else {
+            return {
+                totalEmployees,
+                totalHod
+            }
+        }
+
+    }
 }
