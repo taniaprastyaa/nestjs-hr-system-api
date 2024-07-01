@@ -359,4 +359,92 @@ export class EmployeeTaskService {
             throw new InternalServerErrorException('Employee Task failed to delete');
         }
     }
+
+    async getStatistics(user_id) {
+        const employee = await this.prisma.client.employee.findFirst({
+            where: {
+                user_id
+            }
+        });
+
+        const totalAllEmployeeTasks = await this.prisma.client.employeeTask.count();
+
+        const totalPendingTasks = await this.prisma.client.employeeTask.count({
+            where: {
+                status: "Paused"
+            }
+        });
+
+        const totalFinishedTasks = await this.prisma.client.employeeTask.count({
+            where: {
+                status: "Done"
+            }
+        });
+
+        if(employee) {
+            const totalEmployeeTasksPerDepartment = await this.prisma.client.employeeTask.count({
+                where: {
+                    department_id: employee.department_id
+                }
+            });
+
+            const totalPendingTasksPerDepartment = await this.prisma.client.employeeTask.count({
+                where: {
+                    status: "Paused",
+                    department_id: employee.department_id
+                }
+            });
+    
+            const totalFinishedTasksPerDepartment = await this.prisma.client.employeeTask.count({
+                where: {
+                    status: "Done",
+                    department_id: employee.department_id
+                }
+            });
+
+            const totalEmployeeTasks = await this.prisma.client.employeesOnAssignment.count({
+                where: {
+                    employee_id: employee.id
+                }
+            });
+
+            
+            const totalEmployeePendingTasks = await this.prisma.client.employeeTask.count({
+                where: {
+                    assignedEmployees: {
+                        some: {
+                            employee_id: employee.id
+                        }
+                    },
+                    status: 'Paused'
+                }
+            });
+
+            const totalEmployeeFinishedTasks = await this.prisma.client.employeeTask.count({
+                where: {
+                    assignedEmployees: {
+                        some: {
+                            employee_id: employee.id
+                        }
+                    },
+                    status: 'Done'
+                }
+            });
+
+            return {
+                totalEmployeeTasksPerDepartment,
+                totalPendingTasksPerDepartment,
+                totalFinishedTasksPerDepartment,
+                totalEmployeeTasks,
+                totalEmployeePendingTasks,
+                totalEmployeeFinishedTasks
+            }
+        } else {
+            return {
+                totalAllEmployeeTasks,
+                totalPendingTasks,
+                totalFinishedTasks
+            }
+        }
+    }
 }
