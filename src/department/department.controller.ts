@@ -8,6 +8,12 @@ import { DepartmentDto } from "./dto";
 @Controller('departments')
 export class DepartmentController{
     constructor(private departmentService: DepartmentService) {}
+    @ApiBearerAuth()
+    
+    @Get('statistics')
+    getStatistics() {
+      return this.departmentService.getStatistics();
+    }
 
     // Get all deparments
     @ApiBearerAuth()

@@ -95,4 +95,12 @@ export class DepartmentService {
             throw new InternalServerErrorException('Department failed to delete');
         }
     }
+
+    async getStatistics() {
+        const totalDepartments = await this.prisma.client.department.count();
+    
+        return {
+            totalDepartments
+        };
+    }
 }
