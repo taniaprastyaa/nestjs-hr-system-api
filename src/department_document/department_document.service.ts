@@ -129,11 +129,6 @@ export class DepartmentDocumentService {
                 id: where.id
             });
 
-            const documentFilePath = path.join(__dirname, '../../assets/department_document', departmentDocument.document_file);
-            if (fs.existsSync(documentFilePath)) {
-              fs.unlinkSync(documentFilePath);
-            }
-
             return ResponseFormatter.success(
                 "Department document deleted successfully",
                 departmentDocument
