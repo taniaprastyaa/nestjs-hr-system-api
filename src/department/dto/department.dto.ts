@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString } from "class-validator";
 export class DepartmentDto {
     @ApiProperty({
         description: "The name of the department",
-        example: "Marketing",
+        example: "Department Name",
     })
     @IsString()
     @IsNotEmpty()

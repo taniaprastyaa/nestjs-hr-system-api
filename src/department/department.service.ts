@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -33,8 +33,23 @@ export class DepartmentService {
     }
 
     // Store department to database
-    async createDepartment(dto: DepartmentDto) : Promise<ResponseFormatter> {
+    async createDepartment(dto: DepartmentDto): Promise<ResponseFormatter> {
         try {
+            const existing = await this.prisma.department.findFirst({
+                where: {
+                    department_name: dto.department_name,
+                    deletedAt: null,
+                },
+            });
+
+            if (existing) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Department name already exists.',
+                    error: 'Conflict',
+                });
+            }
+
             const department = await this.prisma.department.create({
                 data: {
                     ...dto,
@@ -47,13 +62,21 @@ export class DepartmentService {
                 201
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Department already exist');
+            if (err instanceof HttpException) {
+                throw err;
             }
-    
+
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Department name already exists.',
+                    error: 'Conflict',
+                });
+            }
+
             throw new InternalServerErrorException('Department failed to create');
         }
-    } 
+    }
 
     // Update department in database
     async updateDepartment(params: {
@@ -62,6 +85,22 @@ export class DepartmentService {
     }) : Promise<ResponseFormatter> {
         try {
             const {where, dto} = params;
+
+            const existing = await this.prisma.department.findFirst({
+                where: {
+                    department_name: dto.department_name,
+                    deletedAt: null,
+                },
+            });
+
+            if (existing) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Department name already exists.',
+                    error: 'Conflict',
+                });
+            }
+
             const department = await this.prisma.department.update({
                 where,
                 data: {...dto,}
@@ -72,8 +111,16 @@ export class DepartmentService {
                 department
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Department already exist');
+            if (err instanceof HttpException) {
+                throw err;
+            }
+
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Department name already exists.',
+                    error: 'Conflict',
+                });
             }
 
             throw new InternalServerErrorException('Department failed to update');
