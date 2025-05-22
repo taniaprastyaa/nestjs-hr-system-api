@@ -142,7 +142,7 @@ model Employee {
 
 model Department {
   id Int @id @default(autoincrement())
-  department_name String @unique
+  department_name String
   description String
 
   createdAt DateTime @default(now())
@@ -159,7 +159,7 @@ model Department {
 
 model JobPosition {
   id Int @id @default(autoincrement())
-  position_name String @unique
+  position_name String
   description String
   basic_salary Int
 
