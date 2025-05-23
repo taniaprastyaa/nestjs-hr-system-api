@@ -34,8 +34,8 @@ import { join } from 'path';
       isGlobal: true
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'assets/department_document'),
-      serveRoot: '/department_documents',
+      rootPath: join(__dirname, '../../', 'assets/'),
+      serveRoot: '/assets',
     }),
     AuthModule, 
     PrismaModule,

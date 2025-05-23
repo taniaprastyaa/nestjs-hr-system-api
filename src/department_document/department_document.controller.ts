@@ -18,7 +18,7 @@ export class DepartmentDocumentController{
     private formatDocumentUrl(document) {
         return {
             ...document,
-            document_file: `${this.configService.get('BASE_URL')}/department_documents/${document.document_file}`,
+            document_file: `${this.configService.get('BASE_URL')}/assets/department_documents/${document.document_file}`,
         };
     }
 
@@ -53,7 +53,7 @@ export class DepartmentDocumentController{
     // Store department document to database
     @ApiBearerAuth()
     @Post()
-    @UploadDocument('document_file', './assets/department_document')
+    @UploadDocument('document_file', './assets/department_documents')
     @ApiConsumes('multipart/form-data')
     @ApiBody({type: CreateDepartmentDocumentDto})
     async createDepartmentDocument(
@@ -68,7 +68,7 @@ export class DepartmentDocumentController{
     // Update department document in database
     @ApiBearerAuth()
     @Patch(':id')
-    @UploadDocument('document_file', './assets/department_document')
+    @UploadDocument('document_file', './assets/department_documents')
     @ApiConsumes('multipart/form-data')
     @ApiBody({type: UpdateDepartmentDocumentDto})
     async updateDepartmentDocument(
