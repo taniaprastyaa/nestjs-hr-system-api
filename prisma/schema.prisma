@@ -74,8 +74,8 @@ enum AnnouncementType {
 
 model User {
   id Int @id @default(autoincrement())
-  username String @unique
-  email String @unique
+  username String
+  email String
   password String
   hashedRt String?
   role UserRole
@@ -93,9 +93,9 @@ model User {
 model Admin {
   id Int @id @default(autoincrement())
   name String
-  phone String @unique
+  phone String
 
-  user_id Int
+  user_id Int @unique
   user User @relation(fields: [user_id], references: [id])
 
   createdAt DateTime @default(now())
@@ -108,14 +108,14 @@ model Admin {
 model Employee {
   id Int @id @default(autoincrement())
   full_name String
-  phone String @unique
+  phone String
   address String
   date_of_birth String
   gender Gender
   work_entry_date String
   employee_status EmployeeStatus
 
-  user_id Int
+  user_id Int @unique
   user User @relation(fields: [user_id], references: [id])
 
   department_id Int
@@ -174,8 +174,8 @@ model JobPosition {
 
 model DepartmentDocument {
   id Int @id @default(autoincrement())
-  document_name String @unique
-  document_file String @unique
+  document_name String 
+  document_file String
   description String
   
   department_id Int
@@ -207,7 +207,7 @@ model Announcement {
 
 model Leave {
   id Int @id @default(autoincrement())
-  leave_name String @unique
+  leave_name String
   type_of_leave TypeOfLeave 
   value Float
 
@@ -254,7 +254,7 @@ model LeaveAllowance {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
-
+  
   @@map("leave_allowances")
 }
 
