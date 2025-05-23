@@ -8,7 +8,7 @@ HR Web System is a comprehensive and user-friendly web-based application designe
 
 ## Getting Started
 
-Follow these simple steps to run the Backend Bimbel System locally on your machine:
+Follow these simple steps to run the HR System locally on your machine:
 
 ### Prerequisites
 
