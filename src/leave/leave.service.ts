@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -35,6 +35,21 @@ export class LeaveService {
     // Store leave to database
     async createLeave(dto: LeaveDto) : Promise<ResponseFormatter> {
         try {
+            const existing = await this.prisma.leave.findFirst({
+                where: {
+                    leave_name: dto.leave_name,
+                    deletedAt: null,
+                },
+            });
+
+            if (existing) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Leave name already exists.',
+                    error: 'Conflict',
+                });
+            }
+            
             const leave = await this.prisma.leave.create({
                 data: {
                     ...dto,
@@ -47,8 +62,16 @@ export class LeaveService {
                 201
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Leave already exist');
+            if (err instanceof HttpException) {
+                throw err;
+            }
+
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Leave name already exists.',
+                    error: 'Conflict',
+                });
             }
     
             throw new InternalServerErrorException('Leave failed to create');
@@ -62,6 +85,22 @@ export class LeaveService {
     }) : Promise<ResponseFormatter> {
         try {
             const {where, dto} = params;
+
+            const existing = await this.prisma.leave.findFirst({
+                where: {
+                    leave_name: dto.leave_name,
+                    deletedAt: null,
+                },
+            });
+
+            if (existing) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Leave name already exists.',
+                    error: 'Conflict',
+                });
+            }
+
             const leave = await this.prisma.leave.update({
                 where,
                 data: {...dto,}
@@ -72,10 +111,18 @@ export class LeaveService {
                 leave
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Leave already exist');
+            if (err instanceof HttpException) {
+                throw err;
             }
 
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Department name already exists.',
+                    error: 'Conflict',
+                });
+            }
+            
             throw new InternalServerErrorException('Leave failed to update');
         }
     }
