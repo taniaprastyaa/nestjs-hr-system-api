@@ -15,7 +15,7 @@ export class AuthService {
         private config: ConfigService) {}
     
     async signin(dto: SigninDto): Promise<Tokens>{
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findFirst({
             where: {
                 email: dto.email,
             },
