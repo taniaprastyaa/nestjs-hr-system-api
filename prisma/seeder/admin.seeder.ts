@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function seedAdmin() {
-  const user = await prisma.user.findUnique({ where: { username: 'admin' } });
+  const user = await prisma.user.findFirst({ where: { username: 'admin' } });
 
   await prisma.admin.create({
     data: {
