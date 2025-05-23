@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmployeeTaskDto} from './dto';
+import { instanceToPlain } from 'class-transformer';
 const logger = new Logger('EmployeeTaskService');
 
 @Injectable()
@@ -206,6 +207,7 @@ export class EmployeeTaskService {
                     completedAt: dto.completedAt,
                     notes: dto.notes,
                     attachment: dto.attachment,
+                    checklist: dto.checklist ? instanceToPlain(dto.checklist) : [],
                     assigned_by: employee.id
                 }
             });
@@ -293,6 +295,7 @@ export class EmployeeTaskService {
                     completedAt: dto.completedAt,
                     notes: dto.notes,
                     attachment: dto.attachment,
+                    checklist: dto.checklist ? instanceToPlain(dto.checklist) : [],
                     assigned_by: employee["id"]
                 }
             });

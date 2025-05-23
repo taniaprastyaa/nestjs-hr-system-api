@@ -1,6 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { TaskStatus, TaskPriority } from "@prisma/client";
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+
+export class ChecklistItem {
+  @ApiProperty({ example: "Review code" })
+  @IsString()
+  title: string;
+
+  @ApiProperty({ example: true })
+  @IsOptional()
+  done?: boolean;
+}
 
 export class EmployeeTaskDto {
     @ApiProperty({
@@ -74,6 +85,13 @@ export class EmployeeTaskDto {
     @IsString()
     @IsOptional()
     attachment?: string
+
+    @ApiProperty({ type: [ChecklistItem], required: false })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ChecklistItem)
+    @IsOptional()
+    checklist?: ChecklistItem[];
 
     @ApiProperty({
         description: "List of employee IDs assigned to the task",

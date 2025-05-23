@@ -313,6 +313,7 @@ model EmployeeTask {
   task_description String
   deadline String
   status TaskStatus
+  checklist Json?
   
   department_id Int
   department Department @relation(fields: [department_id], references: [id])
