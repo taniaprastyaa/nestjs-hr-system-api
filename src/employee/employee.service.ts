@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger} from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException, Logger} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ResponseFormatter } from 'src/helpers/response.formatter';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -69,65 +69,99 @@ export class EmployeeService {
     }
 
     // Store employee to database
-    async createEmployee(dto: CreateEmployeeDto): Promise<ResponseFormatter>{
-        // Check if the provided phone number already exists for any employee
-        const existingEmployee = await this.prisma.employee.findFirst({
-            where: {
-                phone: dto.phone
-            }
-        });
-
-        if (existingEmployee) {
-            throw new BadRequestException('Employee with the same phone number already exists');
-        }
-
-        const hash = await argon.hash(dto.password);
+    async createEmployee(dto: CreateEmployeeDto): Promise<ResponseFormatter> {
         try {
-            const user = await this.prisma.user.create({
-                data: {
-                    username : dto.username,
-                    email : dto.email,
-                    password : hash,
-                    role : dto.role,
-                },
+            // Cek username atau email sudah dipakai
+            const existingUser = await this.prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { username: dto.username },
+                        { email: dto.email }
+                    ]
+                }
             });
 
-            const userId = await this.getUserLimit1();
+            if (existingUser) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Username or email already exists.',
+                    error: 'Conflict',
+                });
+            }
 
-            const employee = await this.prisma.employee.create({
-                data: {
-                    full_name : dto.full_name,
-                    phone : dto.phone,
-                    address : dto.address,
-                    date_of_birth : dto.date_of_birth,
-                    gender : dto.gender,
-                    work_entry_date : dto.work_entry_date,
-                    employee_status : dto.employee_status,
-                    user_id : userId.id,
-                    department_id : dto.department_id,
-                    position_id : dto.position_id,
-                },
+            // Cek nomor telepon unik
+            const existingPhoneEmployee = await this.prisma.employee.findFirst({
+                where: {
+                    phone: dto.phone
+                }
             });
 
-            // Create employee leave allowance
-            const currentYear = new Date().getFullYear().toString();
-            const employeeLeaveAllowance = await this.prisma.leaveAllowance.create({
-                data: {
-                    employee_id : employee.id,
-                    year : currentYear,
-                },
+            if (existingPhoneEmployee) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Phone number already exists.',
+                    error: 'Conflict',
+                });
+            }
+
+            // Hash password
+            const hash = await argon.hash(dto.password);
+
+            // Transaksi prisma
+            const result = await this.prisma.$transaction(async (tx) => {
+                // Buat user
+                const user = await tx.user.create({
+                    data: {
+                        username: dto.username,
+                        email: dto.email,
+                        password: hash,
+                        role: dto.role,
+                    },
+                });
+
+                // Buat employee
+                const employee = await tx.employee.create({
+                    data: {
+                        full_name: dto.full_name,
+                        phone: dto.phone,
+                        address: dto.address,
+                        date_of_birth: dto.date_of_birth,
+                        gender: dto.gender,
+                        work_entry_date: dto.work_entry_date,
+                        employee_status: dto.employee_status,
+                        user_id: user.id,
+                        department_id: dto.department_id,
+                        position_id: dto.position_id,
+                    },
+                });
+
+                // Buat leave allowance
+                await tx.leaveAllowance.create({
+                    data: {
+                        employee_id: employee.id,
+                        year: new Date().getFullYear().toString(),
+                    },
+                });
+
+                return { user, employee };
             });
 
-            const userEmployee = {user, employee};
-            
             return ResponseFormatter.success(
-                "Employee created succesfully",
-                userEmployee,
+                "Employee created successfully",
+                result,
                 201
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Employee already exist');
+            if (err instanceof HttpException) {
+                throw err;
+            }
+
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Unique constraint failed.',
+                    error: 'Conflict',
+                });
             }
 
             throw new InternalServerErrorException('Employee failed to create');
@@ -138,54 +172,109 @@ export class EmployeeService {
     async updateEmployee(params: {
         where: Prisma.EmployeeWhereUniqueInput;
         dto: UpdateEmployeeDto;
-    }) {
+    }): Promise<ResponseFormatter> {
         try {
-            const {dto, where} = params;
+            const { dto, where } = params;
+
             const existingEmployee = await this.prisma.employee.findUnique({
                 where,
-                include : {
+                include: {
                     user: true
                 }
             });
 
-            const employee = await this.prisma.employee.update({
-                where,
-                data: {
-                    full_name : dto.full_name,
-                    phone : dto.phone,
-                    address : dto.address,
-                    date_of_birth : dto.date_of_birth,
-                    gender : dto.gender,
-                    work_entry_date : dto.work_entry_date,
-                    employee_status : dto.employee_status,
-                    department_id : dto.department_id,
-                    position_id : dto.position_id,
-                },
+            if (!existingEmployee) {
+                throw new BadRequestException('Employee not found');
+            }
+
+            // Cek email/username digunakan oleh user lain
+            const conflictingUser = await this.prisma.user.findFirst({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                { username: dto.username },
+                                { email: dto.email }
+                            ]
+                        },
+                        { id: { not: existingEmployee.user_id } }
+                    ]
+                }
             });
 
-            const user = await this.prisma.user.update({
-                where : {
-                    id : existingEmployee.user_id
-                },
-                data: {
-                    username : dto.username,
-                    email : dto.email,
-                    role : dto.role
-                },
+            if (conflictingUser) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Username or email already exists.',
+                    error: 'Conflict',
+                });
+            }
+
+            // Cek nomor telepon unik
+            const existingPhoneEmployee = await this.prisma.employee.findFirst({
+                where: {
+                    phone: dto.phone,
+                    id: { not: existingEmployee.id }
+                }
             });
 
-            const userEmployee = {user, employee};
+            if (existingPhoneEmployee) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Phone number already exists.',
+                    error: 'Conflict',
+                });
+            }
+
+            // Jalankan dalam transaksi
+            const result = await this.prisma.$transaction(async (tx) => {
+                const updatedEmployee = await tx.employee.update({
+                    where,
+                    data: {
+                        full_name: dto.full_name,
+                        phone: dto.phone,
+                        address: dto.address,
+                        date_of_birth: dto.date_of_birth,
+                        gender: dto.gender,
+                        work_entry_date: dto.work_entry_date,
+                        employee_status: dto.employee_status,
+                        department_id: dto.department_id,
+                        position_id: dto.position_id,
+                    },
+                });
+
+                const updatedUser = await tx.user.update({
+                    where: {
+                        id: existingEmployee.user_id,
+                    },
+                    data: {
+                        username: dto.username,
+                        email: dto.email,
+                        role: dto.role,
+                    },
+                });
+
+                return { updatedUser, updatedEmployee };
+            });
 
             return ResponseFormatter.success(
                 "Employee updated successfully",
-                userEmployee
+                { user: result.updatedUser, employee: result.updatedEmployee }
             );
         } catch (err) {
-            if(err.code === 'P2002') {
-                throw new BadRequestException('Employee already exist');
+            if (err instanceof HttpException) {
+                throw err;
             }
 
-            throw new InternalServerErrorException('Employee failed to create');
+            if (err.code === 'P2002') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Unique constraint failed.',
+                    error: 'Conflict',
+                });
+            }
+
+            throw new InternalServerErrorException('Employee failed to update');
         }
     }
 
